@@ -1,0 +1,16 @@
+Hi Meenakshi,
+
+We have organized your records into an easy-to-use follow-up portal and two ready-to-call spreadsheets:
+
+1. Overdue Call List (58 patients): Patients who missed a scheduled appointment, passed their doctor's review date, or haven't visited in over 4 months. We marked 25 as High Priority because they take insulin or have very high blood sugars—we suggest calling them first.
+2. Due Soon Reminder List (5 patients): Upcoming visits in the next 14 days so your front desk can remind them before they miss their appointment.
+
+Important safety protections we put in place:
+• Do Not Call List: We identified 3 deceased patients and 3 who relocated to other hospitals and removed them from the call lists to prevent distressing calls.
+• Doctor Verification Flags: Patients with abnormal lab tests who haven't yet discussed them with a doctor are flagged for clinician review before calling.
+• Front Desk Alerts: We flagged missing phones, shared family numbers, and duplicate registrations (like Joseph D'Souza).
+
+Your team can launch the portal anytime by running ./run.sh, or download the attached spreadsheets directly. Let us know if you would like any adjustments!
+
+Best regards,
+mera.health Team
