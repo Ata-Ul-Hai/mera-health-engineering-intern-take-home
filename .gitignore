@@ -1,0 +1,8 @@
+brief.md
+email.txt
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+dist/
+.DS_Store
