@@ -605,8 +605,7 @@ export default function App() {
           <div>
             {activeTab === 'OVERDUE' && (
               <span>
-                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits. Start with{' '}
-                <span className="badge badge-urgent" style={{ fontSize: '0.7rem' }}>🔴 High Priority</span> patients (on insulin therapy or severe hyperglycemia).
+                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits.
               </span>
             )}
             {activeTab === 'DUE_SOON' && (
