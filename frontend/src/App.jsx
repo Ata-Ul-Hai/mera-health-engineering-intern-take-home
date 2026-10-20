@@ -454,9 +454,6 @@ export default function App() {
               >
                 {overdueList.length}
               </span>
-              <span className="badge badge-urgent" style={{ fontSize: '0.65rem' }}>
-                {highPriorityTotal} High Risk
-              </span>
             </button>
 
             {/* Due Soon Reminder List Tab */}
