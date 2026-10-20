@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import dataset from './data/processed_data.json';
 import {
   Phone,
@@ -11,40 +11,29 @@ import {
   ShieldAlert,
   ChevronRight,
   X,
-  FileText,
-  User,
   Activity,
-  Filter,
   Check,
-  Building2,
   Stethoscope,
   Info,
   Copy,
-  ExternalLink,
-  ChevronDown,
-  Layers,
-  PhoneCall,
-  Sparkles,
   Users,
   CheckSquare,
-  Flag
+  PhoneCall
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'FLAGGED' | 'ON_TRACK' | 'CLINICAL_REVIEW' | 'EXCLUDED'
+  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'FLAGGED_VERIFICATION' | 'ON_TRACK' | 'EXCLUDED'
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('ALL'); // 'ALL' | 'HIGH' | 'MEDIUM'
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
   const [dispositionFilter, setDispositionFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'BOOKED' | 'VOICEMAIL' | 'CALLBACK' | 'WRONG_NUMBER'
-  const [overdueSubFilter, setOverdueSubFilter] = useState('ALL'); // 'ALL' | 'READY' | 'FLAGGED'
-  const [flagTypeFilter, setFlagTypeFilter] = useState('ALL'); // 'ALL' | 'DUPLICATE' | 'MISSING_PHONE' | 'SHARED_PHONE' | 'NON_DIAB_VISIT' | 'LAB_ONLY'
   const [selectedMRN, setSelectedMRN] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState(null);
 
   // Local storage for Call Outcomes and Front Desk Notes
   const [callRecords, setCallRecords] = useState(() => {
     try {
-      const saved = localStorage.getItem('mera_call_records_v2');
+      const saved = localStorage.getItem('mera_call_records_v3');
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -62,7 +51,7 @@ export default function App() {
         }
       };
       try {
-        localStorage.setItem('mera_call_records_v2', JSON.stringify(updated));
+        localStorage.setItem('mera_call_records_v3', JSON.stringify(updated));
       } catch (e) {
         console.error(e);
       }
@@ -81,7 +70,7 @@ export default function App() {
         }
       };
       try {
-        localStorage.setItem('mera_call_records_v2', JSON.stringify(updated));
+        localStorage.setItem('mera_call_records_v3', JSON.stringify(updated));
       } catch (e) {
         console.error(e);
       }
@@ -106,22 +95,16 @@ export default function App() {
     () => dataset.patients.filter((p) => p.worklist === 'DUE_SOON'),
     []
   );
+  const flaggedList = useMemo(
+    () => dataset.patients.filter((p) => p.worklist === 'FLAGGED_VERIFICATION'),
+    []
+  );
   const onTrackList = useMemo(
     () => dataset.patients.filter((p) => p.worklist === 'ON_TRACK'),
     []
   );
-  const reviewList = useMemo(
-    () => dataset.patients.filter((p) => p.worklist === 'CLINICAL_REVIEW'),
-    []
-  );
   const excludedList = useMemo(
     () => dataset.patients.filter((p) => p.worklist === 'EXCLUDED'),
-    []
-  );
-
-  // Dedicated Flagged List (patients needing administrative / clinical verification)
-  const flaggedList = useMemo(
-    () => dataset.patients.filter((p) => p.warning_flags && p.warning_flags.length > 0 && p.worklist !== 'EXCLUDED'),
     []
   );
 
@@ -141,9 +124,8 @@ export default function App() {
     let list = [];
     if (activeTab === 'OVERDUE') list = [...overdueList];
     else if (activeTab === 'DUE_SOON') list = [...dueSoonList];
-    else if (activeTab === 'FLAGGED') list = [...flaggedList];
+    else if (activeTab === 'FLAGGED_VERIFICATION') list = [...flaggedList];
     else if (activeTab === 'ON_TRACK') list = [...onTrackList];
-    else if (activeTab === 'CLINICAL_REVIEW') list = [...reviewList];
     else if (activeTab === 'EXCLUDED') list = [...excludedList];
 
     // Filter
@@ -153,29 +135,12 @@ export default function App() {
         const q = searchTerm.toLowerCase();
         const matchName = p.name.toLowerCase().includes(q);
         const matchMRN = p.mrn.toLowerCase().includes(q);
-        const matchPhone = p.phone.toLowerCase().includes(q);
+        const matchPhone = (p.phone || '').toLowerCase().includes(q);
         if (!matchName && !matchMRN && !matchPhone) return false;
       }
 
-      // Overdue Sub-Filter (Ready to Call vs Flagged)
-      if (activeTab === 'OVERDUE' && overdueSubFilter !== 'ALL') {
-        const hasFlag = p.warning_flags && p.warning_flags.length > 0;
-        if (overdueSubFilter === 'READY' && hasFlag) return false;
-        if (overdueSubFilter === 'FLAGGED' && !hasFlag) return false;
-      }
-
-      // Flag Type Filter (in Flagged tab)
-      if (activeTab === 'FLAGGED' && flagTypeFilter !== 'ALL') {
-        const flags = p.warning_flags || [];
-        if (flagTypeFilter === 'DUPLICATE' && !flags.some((f) => f.startsWith('Duplicate Registration'))) return false;
-        if (flagTypeFilter === 'MISSING_PHONE' && !flags.some((f) => f.startsWith('Missing Phone'))) return false;
-        if (flagTypeFilter === 'SHARED_PHONE' && !flags.some((f) => f.startsWith('Shared Family Phone'))) return false;
-        if (flagTypeFilter === 'NON_DIAB_VISIT' && !flags.some((f) => f.startsWith('Recent Non-Diabetic Visit'))) return false;
-        if (flagTypeFilter === 'LAB_ONLY' && !flags.some((f) => f.startsWith('Lab Diagnosis Only'))) return false;
-      }
-
       // Priority Filter
-      if (['OVERDUE', 'FLAGGED'].includes(activeTab) && priorityFilter !== 'ALL') {
+      if (activeTab === 'OVERDUE' && priorityFilter !== 'ALL') {
         if (p.priority !== priorityFilter) return false;
       }
 
@@ -186,8 +151,8 @@ export default function App() {
         }
       }
 
-      // Call Disposition Status Filter (matches all 5 outcomes!)
-      if (['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) && dispositionFilter !== 'ALL') {
+      // Call Disposition Status Filter (matches all 5 outcomes)
+      if (['OVERDUE', 'DUE_SOON'].includes(activeTab) && dispositionFilter !== 'ALL') {
         const currentDisp = callRecords[p.mrn]?.status || 'PENDING';
         if (currentDisp !== dispositionFilter) return false;
       }
@@ -196,7 +161,7 @@ export default function App() {
     });
 
     // Priority Ordering
-    if (activeTab === 'OVERDUE' || activeTab === 'FLAGGED') {
+    if (activeTab === 'OVERDUE') {
       // Sort HIGH priority first, then days_overdue descending
       list.sort((a, b) => {
         if (a.priority === 'HIGH' && b.priority !== 'HIGH') return -1;
@@ -206,6 +171,9 @@ export default function App() {
     } else if (activeTab === 'DUE_SOON') {
       // Sort by days_until ascending (most imminent first)
       list.sort((a, b) => a.days_until - b.days_until);
+    } else if (activeTab === 'FLAGGED_VERIFICATION') {
+      // Sort by flag_category, then name
+      list.sort((a, b) => (a.flag_category || '').localeCompare(b.flag_category || '') || a.name.localeCompare(b.name));
     }
 
     return list;
@@ -215,14 +183,11 @@ export default function App() {
     priorityFilter,
     departmentFilter,
     dispositionFilter,
-    overdueSubFilter,
-    flagTypeFilter,
     callRecords,
     overdueList,
     dueSoonList,
     flaggedList,
     onTrackList,
-    reviewList,
     excludedList
   ]);
 
@@ -256,12 +221,10 @@ export default function App() {
         ? 'overdue_diabetic_patients.csv'
         : activeTab === 'DUE_SOON'
         ? 'due_soon_diabetic_patients.csv'
-        : activeTab === 'FLAGGED'
-        ? 'flagged_patients_review.csv'
+        : activeTab === 'FLAGGED_VERIFICATION'
+        ? 'flagged_verification_patients.csv'
         : activeTab === 'ON_TRACK'
         ? 'on_track_diabetic_patients.csv'
-        : activeTab === 'CLINICAL_REVIEW'
-        ? 'clinical_review_diabetic_patients.csv'
         : 'excluded_patients.csv';
 
     const headers = [
@@ -273,7 +236,7 @@ export default function App() {
       'Priority',
       activeTab === 'DUE_SOON' ? 'Days Remaining' : 'Days Overdue',
       'Target Date',
-      'Reason For Call',
+      'Reason For Call / Review',
       'Clinical Evidence',
       'Action & Safety Flags',
       'Last Visit Date',
@@ -311,12 +274,9 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-  // Counts
+  // Progress stats
   const highPriorityTotal = overdueList.filter((p) => p.priority === 'HIGH').length;
   const mediumPriorityTotal = overdueList.filter((p) => p.priority === 'MEDIUM').length;
-  const overdueReadyCount = overdueList.filter((p) => !p.warning_flags || p.warning_flags.length === 0).length;
-  const overdueFlaggedCount = overdueList.filter((p) => p.warning_flags && p.warning_flags.length > 0).length;
-
   const overdueCompletedCount = overdueList.filter(
     (p) => (callRecords[p.mrn]?.status || 'PENDING') !== 'PENDING'
   ).length;
@@ -381,7 +341,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Operational Metrics & As-Of Date */}
+          {/* Operational Metrics & Snapshot Reference Date */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             {/* Total Patients Reconciled Badge */}
             <div
@@ -394,7 +354,7 @@ export default function App() {
                 alignItems: 'center',
                 gap: 6
               }}
-              title="300 Total = 58 Overdue + 5 Due Soon + 37 On Track + 3 Review + 197 Excluded"
+              title="300 Total = 45 Overdue + 5 Due Soon + 23 Flagged Verification + 32 On Track + 195 Excluded"
             >
               <Users size={14} color="#64748b" />
               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Total Export:</span>
@@ -465,8 +425,8 @@ export default function App() {
                 background:
                   activeTab === 'DUE_SOON'
                     ? '#059669'
-                    : activeTab === 'FLAGGED'
-                    ? '#b45309'
+                    : activeTab === 'FLAGGED_VERIFICATION'
+                    ? '#d97706'
                     : '#1e3a8a',
                 color: '#fff',
                 padding: '8px 16px',
@@ -482,8 +442,8 @@ export default function App() {
                 ? 'Export Overdue List (CSV)'
                 : activeTab === 'DUE_SOON'
                 ? 'Export Due Soon List (CSV)'
-                : activeTab === 'FLAGGED'
-                ? 'Export Flagged List (CSV)'
+                : activeTab === 'FLAGGED_VERIFICATION'
+                ? 'Export Flagged Verification (CSV)'
                 : activeTab === 'ON_TRACK'
                 ? 'Export On Track List (CSV)'
                 : 'Export Worklist (CSV)'}
@@ -494,7 +454,7 @@ export default function App() {
 
       {/* Main Workspace */}
       <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Navigation Tabs Bar */}
+        {/* Navigation Tabs Bar - All 5 Mutually Exclusive Buckets Totaling Exactly 300 */}
         <div
           style={{
             display: 'flex',
@@ -579,10 +539,10 @@ export default function App() {
               </span>
             </button>
 
-            {/* 3. Dedicated Flagged for Review Tab */}
+            {/* 3. Flagged for Verification Tab */}
             <button
               onClick={() => {
-                setActiveTab('FLAGGED');
+                setActiveTab('FLAGGED_VERIFICATION');
                 setSelectedMRN(null);
               }}
               style={{
@@ -591,20 +551,20 @@ export default function App() {
                 gap: 8,
                 padding: '10px 18px',
                 fontSize: '0.88rem',
-                fontWeight: activeTab === 'FLAGGED' ? 700 : 500,
-                color: activeTab === 'FLAGGED' ? '#92400e' : 'var(--text-secondary)',
-                borderBottom: activeTab === 'FLAGGED' ? '2.5px solid #f59e0b' : '2.5px solid transparent',
-                background: activeTab === 'FLAGGED' ? '#fef3c7' : 'transparent',
+                fontWeight: activeTab === 'FLAGGED_VERIFICATION' ? 700 : 500,
+                color: activeTab === 'FLAGGED_VERIFICATION' ? '#b45309' : 'var(--text-secondary)',
+                borderBottom: activeTab === 'FLAGGED_VERIFICATION' ? '2.5px solid #d97706' : '2.5px solid transparent',
+                background: activeTab === 'FLAGGED_VERIFICATION' ? '#fffbeb' : 'transparent',
                 borderRadius: '8px 8px 0 0',
                 transition: 'all 0.15s ease'
               }}
             >
-              <Flag size={16} color={activeTab === 'FLAGGED' ? '#b45309' : '#64748b'} />
-              <span>Flagged for Review</span>
+              <AlertTriangle size={16} color={activeTab === 'FLAGGED_VERIFICATION' ? '#d97706' : '#64748b'} />
+              <span>Flagged for Verification</span>
               <span
                 style={{
-                  background: activeTab === 'FLAGGED' ? '#d97706' : 'var(--bg-subtle)',
-                  color: activeTab === 'FLAGGED' ? '#fff' : 'var(--text-secondary)',
+                  background: activeTab === 'FLAGGED_VERIFICATION' ? '#d97706' : 'var(--bg-subtle)',
+                  color: activeTab === 'FLAGGED_VERIFICATION' ? '#fff' : 'var(--text-secondary)',
                   borderRadius: 12,
                   padding: '1px 8px',
                   fontSize: '0.72rem',
@@ -612,9 +572,6 @@ export default function App() {
                 }}
               >
                 {flaggedList.length}
-              </span>
-              <span className="badge badge-medium" style={{ fontSize: '0.65rem' }}>
-                Verify First
               </span>
             </button>
 
@@ -654,43 +611,7 @@ export default function App() {
               </span>
             </button>
 
-            {/* 5. Clinical Review Tab */}
-            <button
-              onClick={() => {
-                setActiveTab('CLINICAL_REVIEW');
-                setSelectedMRN(null);
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '10px 18px',
-                fontSize: '0.88rem',
-                fontWeight: activeTab === 'CLINICAL_REVIEW' ? 700 : 500,
-                color: activeTab === 'CLINICAL_REVIEW' ? 'var(--purple-text)' : 'var(--text-secondary)',
-                borderBottom: activeTab === 'CLINICAL_REVIEW' ? '2.5px solid #7c3aed' : '2.5px solid transparent',
-                background: activeTab === 'CLINICAL_REVIEW' ? 'var(--purple-bg)' : 'transparent',
-                borderRadius: '8px 8px 0 0',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <Stethoscope size={16} color={activeTab === 'CLINICAL_REVIEW' ? '#7c3aed' : '#64748b'} />
-              <span>Borderline Queue</span>
-              <span
-                style={{
-                  background: activeTab === 'CLINICAL_REVIEW' ? '#7c3aed' : 'var(--bg-subtle)',
-                  color: activeTab === 'CLINICAL_REVIEW' ? '#fff' : 'var(--text-secondary)',
-                  borderRadius: 12,
-                  padding: '1px 8px',
-                  fontSize: '0.72rem',
-                  fontWeight: 700
-                }}
-              >
-                {reviewList.length}
-              </span>
-            </button>
-
-            {/* 6. Excluded Guardrails Tab */}
+            {/* 5. Excluded Guardrails Tab */}
             <button
               onClick={() => {
                 setActiveTab('EXCLUDED');
@@ -736,24 +657,20 @@ export default function App() {
                 ? '#fff1f2'
                 : activeTab === 'DUE_SOON'
                 ? '#f0fdf4'
-                : activeTab === 'FLAGGED'
+                : activeTab === 'FLAGGED_VERIFICATION'
                 ? '#fffbeb'
                 : activeTab === 'ON_TRACK'
                 ? '#eff6ff'
-                : activeTab === 'CLINICAL_REVIEW'
-                ? '#faf5ff'
                 : '#f8fafc',
             border: `1px solid ${
               activeTab === 'OVERDUE'
                 ? '#fecdd3'
                 : activeTab === 'DUE_SOON'
                 ? '#bbf7d0'
-                : activeTab === 'FLAGGED'
+                : activeTab === 'FLAGGED_VERIFICATION'
                 ? '#fde68a'
                 : activeTab === 'ON_TRACK'
                 ? '#bfdbfe'
-                : activeTab === 'CLINICAL_REVIEW'
-                ? '#e9d5ff'
                 : '#cbd5e1'
             }`,
             borderRadius: 8,
@@ -769,33 +686,27 @@ export default function App() {
           <div>
             {activeTab === 'OVERDUE' && (
               <span>
-                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits. Use the sub-filter below to toggle between{' '}
-                <strong>Ready to Call ({overdueReadyCount} unflagged)</strong> and <strong>Flagged for Verification ({overdueFlaggedCount})</strong>.
+                <strong>Front Desk Directive:</strong> 45 confirmed, non-duplicate diabetic patients ready for recall calls. Patients are indexed in priority order (🔴 High Priority first on insulin or with acute hyperglycemia, followed by days overdue).
               </span>
             )}
             {activeTab === 'DUE_SOON' && (
               <span>
-                <strong>Front Desk Directive:</strong> Preventive reminder calls. These patients have scheduled appointments or review targets within the next 14 days or are approaching 4 months. Calling them now prevents missed appointments.
+                <strong>Front Desk Directive:</strong> Preventive reminder calls. These 5 patients have scheduled appointments or review targets within the next 14 days or are approaching 4 months. Calling them now prevents missed appointments.
               </span>
             )}
-            {activeTab === 'FLAGGED' && (
+            {activeTab === 'FLAGGED_VERIFICATION' && (
               <span>
-                <strong>Administrative & Clinical Caution:</strong> Patients on this list carry specific warning flags (duplicate registrations, shared numbers, missing phones, recent non-diabetic visits, or lab-only diagnoses). Review the flag before dialing to prevent calling the wrong person or disclosing uncommunicated diagnoses.
+                <strong>Verification Directive:</strong> 23 patients isolated for clinical or administrative review before outreach. Isolating duplicate registration profiles prevents double-calling, while lab-only findings and borderline prediabetes require clinician verification before contact.
               </span>
             )}
             {activeTab === 'ON_TRACK' && (
               <span>
-                <strong>System Status:</strong> Diabetic patients whose care is up to date (seen recently or appointment scheduled in the future). No recall action required.
-              </span>
-            )}
-            {activeTab === 'CLINICAL_REVIEW' && (
-              <span>
-                <strong>Doctor Directive:</strong> Review before calling. These patients have borderline prediabetes (HbA1c 5.7–6.4% or impaired fasting glucose) requiring clinical lifestyle advice rather than active recall.
+                <strong>System Status:</strong> 32 diabetic patients whose care is up to date (seen recently or appointment scheduled in the future). No recall action required.
               </span>
             )}
             {activeTab === 'EXCLUDED' && (
               <span>
-                <strong>Audit Directive:</strong> 3 deceased patients, 3 transferred-care patients, and 191 confirmed non-diabetic screening patients are protected here with full clinical documentation.
+                <strong>Audit Directive:</strong> 195 non-actionable charts protected here (3 deceased, 3 transferred care, and 189 confirmed non-diabetic screening patients) with full clinical documentation.
               </span>
             )}
           </div>
@@ -817,7 +728,7 @@ export default function App() {
           }}
         >
           {/* Search Input */}
-          <div style={{ position: 'relative', flex: '1 1 240px' }}>
+          <div style={{ position: 'relative', flex: '1 1 280px' }}>
             <Search
               size={15}
               color="var(--text-muted)"
@@ -825,7 +736,7 @@ export default function App() {
             />
             <input
               type="text"
-              placeholder="Search patient, MRN, phone..."
+              placeholder="Search by patient name, MRN, phone number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -841,83 +752,8 @@ export default function App() {
             />
           </div>
 
-          {/* Overdue Sub-Filter Toggle (in Overdue tab) */}
+          {/* Priority Filter (Overdue tab) */}
           {activeTab === 'OVERDUE' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--bg-subtle)', padding: 3, borderRadius: 6, border: '1px solid var(--border-medium)' }}>
-              <button
-                onClick={() => setOverdueSubFilter('ALL')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 4,
-                  fontSize: '0.78rem',
-                  fontWeight: overdueSubFilter === 'ALL' ? 700 : 500,
-                  background: overdueSubFilter === 'ALL' ? 'var(--bg-surface)' : 'transparent',
-                  color: overdueSubFilter === 'ALL' ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  boxShadow: overdueSubFilter === 'ALL' ? 'var(--shadow-sm)' : 'none'
-                }}
-              >
-                All Overdue ({overdueList.length})
-              </button>
-              <button
-                onClick={() => setOverdueSubFilter('READY')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 4,
-                  fontSize: '0.78rem',
-                  fontWeight: overdueSubFilter === 'READY' ? 700 : 500,
-                  background: overdueSubFilter === 'READY' ? 'var(--bg-surface)' : 'transparent',
-                  color: overdueSubFilter === 'READY' ? '#15803d' : 'var(--text-secondary)',
-                  boxShadow: overdueSubFilter === 'READY' ? 'var(--shadow-sm)' : 'none'
-                }}
-              >
-                ✅ Ready to Call ({overdueReadyCount})
-              </button>
-              <button
-                onClick={() => setOverdueSubFilter('FLAGGED')}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 4,
-                  fontSize: '0.78rem',
-                  fontWeight: overdueSubFilter === 'FLAGGED' ? 700 : 500,
-                  background: overdueSubFilter === 'FLAGGED' ? 'var(--bg-surface)' : 'transparent',
-                  color: overdueSubFilter === 'FLAGGED' ? '#b45309' : 'var(--text-secondary)',
-                  boxShadow: overdueSubFilter === 'FLAGGED' ? 'var(--shadow-sm)' : 'none'
-                }}
-              >
-                ⚠️ Flagged ({overdueFlaggedCount})
-              </button>
-            </div>
-          )}
-
-          {/* Flag Type Sub-Filter (in Flagged tab) */}
-          {activeTab === 'FLAGGED' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Flag Type:</span>
-              <select
-                value={flagTypeFilter}
-                onChange={(e) => setFlagTypeFilter(e.target.value)}
-                style={{
-                  background: 'var(--bg-canvas)',
-                  border: '1px solid var(--border-medium)',
-                  color: 'var(--text-primary)',
-                  padding: '6px 10px',
-                  borderRadius: 6,
-                  fontSize: '0.8rem',
-                  fontWeight: 500
-                }}
-              >
-                <option value="ALL">All Warning Types ({flaggedList.length})</option>
-                <option value="DUPLICATE">⚠️ Duplicate Registrations (8)</option>
-                <option value="MISSING_PHONE">📞 Missing Phone Numbers (8)</option>
-                <option value="SHARED_PHONE">👥 Shared Family Phones (9)</option>
-                <option value="NON_DIAB_VISIT">🏥 Recent Non-Diabetic Visits (36)</option>
-                <option value="LAB_ONLY">🧪 Lab Diagnosis Only (11)</option>
-              </select>
-            </div>
-          )}
-
-          {/* Priority Filter */}
-          {['OVERDUE', 'FLAGGED'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Priority:</span>
               <select
@@ -934,14 +770,14 @@ export default function App() {
                 }}
               >
                 <option value="ALL">All Priorities</option>
-                <option value="HIGH">🔴 High Priority</option>
-                <option value="MEDIUM">🟡 Medium Priority</option>
+                <option value="HIGH">🔴 High Priority ({highPriorityTotal})</option>
+                <option value="MEDIUM">🟡 Medium Priority ({mediumPriorityTotal})</option>
               </select>
             </div>
           )}
 
           {/* Call Status Filter matching all 5 disposition states */}
-          {['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) && (
+          {['OVERDUE', 'DUE_SOON'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Call Outcome:</span>
               <select
@@ -1013,11 +849,25 @@ export default function App() {
               <thead>
                 <tr>
                   <th style={{ width: 45, textAlign: 'center' }}>#</th>
-                  <th style={{ width: 140 }}>Call Outcome</th>
-                  <th style={{ width: 125 }}>{activeTab === 'DUE_SOON' ? 'Status' : 'Priority'}</th>
+                  <th style={{ width: 140 }}>
+                    {['OVERDUE', 'DUE_SOON'].includes(activeTab) ? 'Call Outcome' : 'Queue State'}
+                  </th>
+                  <th style={{ width: 130 }}>
+                    {activeTab === 'OVERDUE'
+                      ? 'Priority'
+                      : activeTab === 'DUE_SOON'
+                      ? 'Due Window'
+                      : activeTab === 'FLAGGED_VERIFICATION'
+                      ? 'Flag Category'
+                      : 'Clinical Status'}
+                  </th>
                   <th style={{ width: 220 }}>Patient Details</th>
                   <th style={{ width: 160 }}>Phone & Actions</th>
-                  <th>Trigger / Reason For Follow-Up</th>
+                  <th>
+                    {activeTab === 'FLAGGED_VERIFICATION'
+                      ? 'Verification Reasons & Action Alerts'
+                      : 'Trigger / Reason For Follow-Up'}
+                  </th>
                   <th style={{ width: 180 }}>Last Visit Info</th>
                   <th style={{ width: 60, textAlign: 'center' }}>Dossier</th>
                 </tr>
@@ -1046,9 +896,9 @@ export default function App() {
                           {idx + 1}
                         </td>
 
-                        {/* Call Outcome Selector */}
+                        {/* Call Outcome Selector or Status Badge */}
                         <td onClick={(e) => e.stopPropagation()}>
-                          {['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) ? (
+                          {['OVERDUE', 'DUE_SOON'].includes(activeTab) ? (
                             <select
                               value={disp}
                               onChange={(e) => updateDisposition(patient.mrn, e.target.value)}
@@ -1094,9 +944,9 @@ export default function App() {
                           )}
                         </td>
 
-                        {/* Priority / Time Metric */}
+                        {/* Priority / Category / Status */}
                         <td>
-                          {['OVERDUE', 'FLAGGED'].includes(activeTab) && (
+                          {activeTab === 'OVERDUE' && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                               {patient.priority === 'HIGH' ? (
                                 <span className="badge badge-urgent">
@@ -1110,7 +960,7 @@ export default function App() {
                                 </span>
                               )}
                               <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                {patient.days_overdue > 0 ? `${patient.days_overdue}d overdue` : `${patient.days_until}d remaining`}
+                                {patient.days_overdue}d overdue
                               </span>
                             </div>
                           )}
@@ -1126,15 +976,38 @@ export default function App() {
                             </div>
                           )}
 
-                          {activeTab === 'ON_TRACK' && (
-                            <span className="badge badge-success" style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>
-                              <CheckCircle2 size={11} /> On Track
+                          {activeTab === 'FLAGGED_VERIFICATION' && (
+                            <span
+                              className="badge"
+                              style={{
+                                background:
+                                  patient.flag_category === 'Duplicate Registration'
+                                    ? '#fee2e2'
+                                    : patient.flag_category === 'Lab-Only Finding'
+                                    ? '#f3e8ff'
+                                    : '#fef3c7',
+                                color:
+                                  patient.flag_category === 'Duplicate Registration'
+                                    ? '#991b1b'
+                                    : patient.flag_category === 'Lab-Only Finding'
+                                    ? '#6b21a8'
+                                    : '#92400e',
+                                border:
+                                  patient.flag_category === 'Duplicate Registration'
+                                    ? '1px solid #fecaca'
+                                    : patient.flag_category === 'Lab-Only Finding'
+                                    ? '1px solid #e9d5ff'
+                                    : '1px solid #fde68a'
+                              }}
+                            >
+                              <AlertTriangle size={11} />
+                              {patient.flag_category}
                             </span>
                           )}
 
-                          {activeTab === 'CLINICAL_REVIEW' && (
-                            <span className="badge badge-purple">
-                              <Stethoscope size={11} /> Review
+                          {activeTab === 'ON_TRACK' && (
+                            <span className="badge badge-success" style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>
+                              <CheckCircle2 size={11} /> On Track
                             </span>
                           )}
 
@@ -1203,7 +1076,7 @@ export default function App() {
                           )}
                         </td>
 
-                        {/* Compact Tokenized Reason Box & Safety Flags */}
+                        {/* Compact Reason Box & Warning Flags */}
                         <td>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                             {/* Structured Reason Tokens */}
@@ -1248,7 +1121,7 @@ export default function App() {
                                 ))
                               ) : (
                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                                  {patient.exclusion_reason}
+                                  {patient.exclusion_reason || patient.reason_summary}
                                 </span>
                               )}
                             </div>
@@ -1256,11 +1129,11 @@ export default function App() {
                             {/* Prominent Action & Safety Flags */}
                             {patient.warning_flags && patient.warning_flags.length > 0 && (
                               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                                {patient.warning_flags.map((flag, idx) => {
-                                  const isNonDiab = flag.startsWith('Recent Non-Diabetic Visit');
+                                {patient.warning_flags.map((flag, flagIdx) => {
                                   const isDup = flag.startsWith('Duplicate Registration');
                                   const isShared = flag.startsWith('Shared Family Phone');
                                   const isLabOnly = flag.startsWith('Lab Diagnosis Only');
+                                  const isNonDiab = flag.startsWith('Recent Non-Diabetic Visit');
 
                                   let cls = 'badge-medium';
                                   if (isDup) cls = 'badge-urgent';
@@ -1269,7 +1142,7 @@ export default function App() {
                                   if (isNonDiab) cls = 'badge-medium';
 
                                   return (
-                                    <span key={idx} className={`badge ${cls}`} style={{ fontSize: '0.68rem' }}>
+                                    <span key={flagIdx} className={`badge ${cls}`} style={{ fontSize: '0.68rem' }}>
                                       <AlertTriangle size={10} />
                                       {flag}
                                     </span>
@@ -1514,7 +1387,7 @@ export default function App() {
               {/* Trigger Explanation */}
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>
-                  Why This Patient Is On The Call List
+                  Why This Patient Is On The List
                 </span>
                 <div
                   style={{
@@ -1526,16 +1399,18 @@ export default function App() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
                     <span className="badge badge-urgent">
-                      {selectedPatient.reason_tokens?.[0] || 'Follow-Up Overdue'}
+                      {selectedPatient.reason_tokens?.[0] || selectedPatient.flag_category || 'Follow-Up Overdue'}
                     </span>
                     <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>
                       {selectedPatient.days_overdue > 0
                         ? `${selectedPatient.days_overdue} days overdue`
-                        : `${selectedPatient.days_until} days remaining`}
+                        : selectedPatient.days_until > 0
+                        ? `${selectedPatient.days_until} days remaining`
+                        : selectedPatient.flag_category || 'Action required'}
                     </span>
                   </div>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    {selectedPatient.reason_summary}
+                    {selectedPatient.reason_summary || selectedPatient.exclusion_reason}
                   </p>
                   <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border-light)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     <strong>Clinical Evidence:</strong> {(selectedPatient.clinical_evidence || []).join('; ')}
@@ -1546,7 +1421,7 @@ export default function App() {
               {/* Latest OPD Visit Note */}
               <div>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: 6 }}>
-                  Most Recent Doctor Note ({selectedPatient.latest_visit?.visit_date})
+                  Most Recent Care Note ({selectedPatient.latest_visit?.visit_date})
                 </span>
                 <div
                   style={{

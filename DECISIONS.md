@@ -3,102 +3,80 @@
 ## 1. Terms Defined from the Request
 
 ### "System / Reference Date (2026-10-01)"
-The hospital export does not specify an evaluation timestamp. We established **October 1, 2026 (`2026-10-01`)** as the system baseline based on chronological evidence:
-- The latest recorded visit in `visits.csv` occurred on `2026-09-29`.
-- The latest prescription in `prescriptions.csv` was dispensed on `2026-09-29`.
-- The request email from Meenakshi was received in early October 2026.
-Choosing `2026-10-01` accurately represents the hospital's snapshot date when the data was extracted.
+Established as **October 1, 2026 (`2026-10-01`)** based on data chronology:
+- Latest visit in `visits.csv`: `2026-09-29`.
+- Latest prescription in `prescriptions.csv`: `2026-09-29`.
+- Meenakshi's operations request: early October 2026.
+All follow-up metrics (days overdue/remaining) are evaluated relative to this static snapshot.
 
-### "Diabetic"
-The email asks for "diabetic patients". We defined a diabetic patient through four clinical criteria:
-1. **Diabetology Department**: Any patient who attended the Diabetology specialty.
-2. **Antidiabetic Medications**: Any patient prescribed insulin (Glargine, Aspart, Degludec, Lispro, Mixtard) or oral hypoglycemic agents (Metformin, Glimepiride, Gliclazide, Sitagliptin, Vildagliptin, Dapagliflozin).
-3. **Clinical Notes (Negation-Filtered)**: Documented diagnosis of Type 1, Type 2, or gestational diabetes (e.g., `T2DM`, `type 2 diabetes`, `k/c/o DM`, `known diabetic`) across any department.
-4. **Lab Findings**: Patients with lab tests in the diabetic range (HbA1c ≥ 6.5%, FBS ≥ 126 mg/dL) who lack clinic notes or prescriptions are categorized as *Diabetic (Lab Findings)*, but flagged with a mandatory warning badge requiring clinician verification before calling.
-*Why*: Excluding non-diabetology notes would miss 36 diabetic patients managed in General Medicine or other departments. Conversely, naive keyword searching falsely identifies patients whose notes state *"Denies diabetes"* or *"Father diabetic"*.
+### "Diabetic Patient"
+Defined using four clinical criteria:
+1. **Diabetology Specialty**: Any attendance in Diabetology.
+2. **Antidiabetic Medications**: Prescriptions for insulin (Glargine, Aspart, Degludec, Lispro, Mixtard) or oral hypoglycemics (Metformin, Glimepiride, Gliclazide, Sitagliptin, Vildagliptin, Dapagliflozin).
+3. **Clinical Notes (Negation-Filtered)**: Diagnoses of Type 1, Type 2, gestational, or juvenile diabetes (e.g., `T2DM`, `type 2 DM`, `Type 2 diabetes`, `k/c/o DM`, `known diabetic`) across all departments, filtered against negations (*"denies diabetes"*, *"non-diabetic"*, *"no h/o diabetes"*, *"father diabetic"*, *"urine sugar nil"*).
+4. **Laboratory Findings**: Tests in diabetic range (HbA1c $\ge 6.5\%$ or $\ge 48$ mmol/mol; FBS $\ge 126$ mg/dL or $\ge 7.0$ mmol/L; PPBS $\ge 200$ mg/dL or $\ge 11.1$ mmol/L). Patients with abnormal labs but no clinical documentation or prescriptions are categorized as *Lab-Only Findings* and routed to verification.
 
 ### "Overdue for Follow-Up"
-Evaluated strictly against the patient's **active baseline** (superseding older missed dates if the patient returned on a later date):
-* **Tier 1 (Explicit Appointment)**: If a `next_appointment` was scheduled and the date has passed with no subsequent visit, the patient is overdue.
-* **Tier 2 (Doctor Review Interval in Notes)**: If no appointment date was booked, but the doctor wrote a review timeframe (e.g., *"review 6 wks"*, *"r/v 3/12"* = 90 days, *"review after 3 months"*), that calculated target date determines overdue status.
-* **Tier 3 (Clinical Fallback)**: If neither an appointment nor a review timeframe was recorded, standard diabetes guidelines recommend evaluation every 3 to 6 months. We set a threshold of $> 4$ months (120 days) since the last visit without follow-up.
+Evaluated strictly from the patient's **latest diabetes-specific activity** (Diabetology visit, antidiabetic prescription, or notes reviewing sugars/diabetes). Unrelated specialty visits (Dental, ENT, Orthopaedics) do not reset diabetic follow-up:
+* **Tier 1 (Explicit Appointment)**: If a `next_appointment` was scheduled at a diabetes visit and the date passed without a subsequent diabetes visit, the patient is overdue.
+* **Tier 2 (Review Interval in Notes)**: If no appointment was booked, but the doctor specified a review interval (e.g., *"review 6 wks"*, *"r/v 3/12"* = 90 days), that target date determines overdue status.
+* **Tier 3 (Clinical 4-Month Fallback)**: If neither an appointment nor an interval was recorded, clinical guidelines recommend evaluation within 4 months (120 days). Overdue if $> 120$ days elapse without follow-up.
 
 ### "Priority Ordering"
-To optimize front-desk calling queues, overdue patients are indexed in priority order:
-- **🔴 High Priority (25 patients)**: Overdue patients with acute clinical vulnerability:
-  1. Prescribed **Insulin** (Inj. Insulin Glargine, Aspart, Degludec, Lispro, Mixtard) — lapse in insulin therapy carries immediate risk of severe hyperglycemia or diabetic ketoacidosis (DKA).
-  2. Laboratory **HbA1c ≥ 9.0%** or blood sugar ≥ 250 mg/dL.
-  3. Physician notes documenting uncontrolled glycemic status (*"sugars running high"*, *"sugars not under control"*, *"c/o burning soles"*).
+Overdue patients are indexed in priority order for front-desk calling:
+- **🔴 High Priority (24 patients)**: Acute clinical vulnerability:
+  1. Prescribed **Insulin** (lapse risks rapid hyperglycemia or DKA).
+  2. Laboratory **HbA1c $\ge 9.0\%$** (or $\ge 75$ mmol/mol) or blood sugar $\ge 250$ mg/dL (or $\ge 13.9$ mmol/L).
+  3. Notes documenting acute glycemic instability (*"sugars running high"*, *"burning soles"*, *"DKA"*).
   *Indexed first, sorted by days overdue descending.*
-- **🟡 Medium Priority (33 patients)**: Overdue patients on standard oral medications (Metformin, Glimepiride) without severe hyperglycemia or acute notes, sorted by days overdue descending.
-- **🟢 Due Soon (5 patients)**: Scheduled appointment or note review target within the next 14 days, or approaching 4 months since last contact, sorted by days remaining ascending.
-
-### "Dedicated Flagged Review List & Segmentation"
-Putting flagged patients directly into an unsegmented calling queue risks front-desk staff calling unaware of critical clinical or administrative caveats. To eliminate this risk:
-1. **Dedicated Tab (`Flagged for Review`)**: Surfaces all 55 diabetic patients who carry warning flags, filterable by specific flag types: Duplicate Registrations (8), Missing Phone Numbers (8), Shared Family Phones (9), Subsequent Non-Diabetic Visits (36), and Lab-Only Diagnoses (11).
-2. **Overdue Sub-Filter (`Ready to Call` vs `Flagged`)**: In the Overdue tab, front desk staff can filter directly between **Ready to Call (25 clean patients)** and **Flagged for Review (33 patients)** with a single click.
-3. **Dedicated CSV Export (`export/flagged_patients_review.csv`)**: Generated alongside `overdue_diabetic_patients.csv` and `due_soon_diabetic_patients.csv` to allow medical records and senior staff to audit and resolve flagged cases offline.
+- **🟡 Medium Priority (21 patients)**: Overdue patients on oral therapies without acute hyperglycemia, sorted by days overdue descending.
+- **🟢 Due Soon (5 patients)**: Target date within the next 14 days or approaching 4 months, sorted by days remaining ascending.
 
 ### "Front Desk Call Outcomes (Dispositions)"
-To support front-desk workflow, every call is tracked with five mutually exclusive operational states:
-1. `To Call (Pending)`: Default queue state; patient has not yet been dialed.
-2. `Booked / Rescheduled`: Patient reached; follow-up appointment successfully agreed and scheduled.
-3. `Voicemail / Left Msg`: Call attempted; voicemail left or message taken by an adult household member.
-4. `Callback Requested`: Patient reached but requested a return call at a specific later time.
-5. `Wrong / Inactive`: Number invalid, disconnected, or wrong person; automatically flags the chart for medical records to verify contact details.
+Calls are tracked across five operational states:
+1. `To Call (Pending)`: Uncontacted in queue.
+2. `Booked / Rescheduled`: Patient reached; appointment confirmed.
+3. `Voicemail / Left Msg`: Reached voicemail or message left with family.
+4. `Callback Requested`: Patient requested a callback at a later time.
+5. `Wrong / Inactive`: Number unreachable or invalid; flagged for EMR audit.
 
-### "Complete Bucket Partition (Exactly 300 Patients)"
-Every patient belongs to exactly one mutually exclusive bucket whose sum equals the total 300 patients:
-- 📞 **Overdue Call List**: **58** (Target date passed without follow-up; active call list)
-- ⏳ **Due Soon Reminder List**: **5** (Target date in next 14 days; preventive reminder calls)
-- 🩺 **On Track / Up to Date**: **37** (Diabetic patients seen recently or appointment scheduled in future)
-- 🔍 **Clinical Review Queue**: **3** (Borderline prediabetes HbA1c 5.7–6.4% needing lifestyle counseling)
-- ⛔ **Excluded Guardrails**: **197** (3 Deceased, 3 Transferred Care, 191 Confirmed Non-Diabetic Screenings)
-**Total: $58 + 5 + 37 + 3 + 197 = 300$ patients.**
+### "Mutually Exclusive 300-Patient Partition"
+Every patient belongs to exactly one partition:
+- 📞 **Overdue Call List**: **45** (Clean, confirmed diabetic patients ready for recall)
+- ⏳ **Due Soon Reminder List**: **5** (Upcoming appointments within 14 days; preventive outreach)
+- ⚠️ **Flagged for Verification**: **23** (8 duplicate profiles, 9 lab-only findings, 3 borderline prediabetes, 3 resolved postpartum GDM)
+- 🩺 **On Track / Up to Date**: **32** (Diabetic patients seen recently or scheduled in future)
+- ⛔ **Excluded Guardrails**: **195** (3 Deceased, 3 Transferred Care, 189 Confirmed Non-Diabetic)
+**Total: $45 + 5 + 23 + 32 + 195 = 300$ patients.**
 
 ---
 
 ## 2. Problems Found in the Data & Actions Taken
 
-1. **Negation & False Positives in Notes**:
-   - *Problem*: 5 patients had diabetes words in negative contexts (e.g., `SVH028557` *"Denies diabetes"*, `SVH026328` *"Non-diabetic"*, `SVH030471` *"no h/o diabetes"*, `SVH025407` *"No h/o diabetes"*, `SVH030117` *"Father diabetic... Urine sugar nil"*). Naive search would falsely label them diabetic.
-   - *Action*: Built a negation-aware regex filter. All 5 are correctly classified as non-diabetic and excluded.
-2. **Symptom Duration Confused with Review Intervals**:
-   - *Problem*: 65 notes contained symptom durations (e.g., *"redness both eyes x 2 months"*, *"x 3 wks"*, *"since 2012"*) alongside doctor review instructions (*"review 3 wks"*). Naive time extractors extract the symptom duration instead of the follow-up.
-   - *Action*: Anchored the regex parser strictly to `\b(?:review|r/v)\s*(?:in|after)?`, ignoring symptom and disease history durations.
-3. **Deceased Patients**:
-   - *Problem*: 3 patients died (`SVH025339` expired at home; `SVH026086` expired in ICU; `SVH025698` expired in Emergency). Calling their families would cause severe trauma.
-   - *Action*: Built an automated safety filter that routes all deceased patients to an audited "Do Not Call" list with full event summaries.
-4. **Transferred Care / Relocated Patients**:
-   - *Problem*: 3 patients officially transferred care to other facilities (`SVH024860` moved to Hyderabad; `SVH025512` transferred near native place; `SVH028346` relocated to Pune).
-   - *Action*: Excluded from call lists with documented destination notes.
-5. **Duplicate Registrations**:
-   - *Problem*: 4 duplicate pairs were identified with identical DOB, sex, phone, and slight name variations (`Joseph Dsouza` / `Joseph D'Souza`, `Md. Rafiq` / `Mohammed Rafiq`, `Padmavathi Reddy` / `Padma Reddy`, `Shivakumar` / `Shivakumar H M`).
-   - *Action*: Maintained both records without destructive merging, but added visible cross-linking badges alerting staff to avoid calling the patient twice.
-6. **Missing & Shared Phone Numbers**:
-   - *Problem*: 8 patients had no phone numbers; 3 phone numbers were shared across family members.
-   - *Action*: Flagged with prominent badges (`[Missing Phone]`, `[Shared Family Phone]`) to prompt staff to verify identity before speaking.
-7. **Superseded Follow-Ups (Late Returns)**:
-   - *Problem*: 145 instances existed where a historical appointment was missed, but the patient visited on a subsequent date.
-   - *Action*: Follow-up obligations are evaluated only from the latest active baseline, preventing false alarms.
+1. **Negation & Family History**: Patients had diabetes keywords in negative contexts (`SVH028557` *"Denies diabetes"*, `SVH026328` *"Non-diabetic"*, `SVH030117` *"Father diabetic... Urine sugar nil"*). Excluded via negation-aware regex filter.
+2. **Symptom Durations vs Review Intervals**: 65 notes contained symptom durations (*"pain x 2 months"*) alongside review instructions (*"review 3 wks"*). Regex was anchored to `\b(?:review|r/v)\s*(?:in|after)?` to extract true review intervals.
+3. **Multi-Unit Lab Values**: Handled dual units for glucose (mg/dL vs mmol/L) and HbA1c (% vs mmol/mol). Recognized variations including `Glucose (F)`, `Glucose (PP)`, and `Post Prandial Glucose` (mmol/L threshold $\ge 11.1$).
+4. **Future-Dated Lab Records**: Identified two future collection dates (`SVH027355` FBS on `19/12/2026`, `SVH030138` HbA1c on `27/02/2027`). Flagged with data integrity alerts and excluded from chronology baselines.
+5. **Unrelated Specialty Visits**: Patients visited Dental, ENT, or Dermatology after missing diabetes follow-ups. Follow-up baselines are anchored strictly to diabetes care; non-diabetic visits do not reset diabetic recall.
+6. **Duplicate Registrations**: Identified 4 duplicate pairs (8 MRNs: `SVH027863`/`SVH029322`, `SVH025473`/`SVH029873`, `SVH027082`/`SVH030772`, `SVH027925`/`SVH029107`) sharing phone, DOB, and sex. Isolated into the verification queue to prevent double-calling.
+7. **Shared Family Phones**: 9 MRNs share phone numbers across family members. Retained in active calling lists with visible badges (`[Shared Family Phone]`).
+8. **Deceased & Transferred Patients**: 3 patients expired (`SVH025339`, `SVH026086`, `SVH025698`) and 3 transferred care (`SVH024860`, `SVH025512`, `SVH028346`). Safely routed to Excluded guardrails.
 
 ---
 
 ## 3. Where We Flagged for Human / Clinical Review
 
-To prevent front-desk staff from making uninformed calls, five categories of patients are flagged for human review and isolated into both a dedicated UI list and a specialized export (`export/flagged_patients_review.csv`):
-
-1. **Abnormal Lab-Only Diagnoses (11 patients)**: Patients with elevated diabetic lab results (e.g. HbA1c ≥ 6.5%, FBS ≥ 126 mg/dL) without an in-system diabetes clinic note or prescription. Classified as diabetic based on clinical test results, but flagged with `[Lab Diagnosis Only - Clinician verification recommended before call]` so staff confirm clinical diagnosis with an attending doctor prior to outreach.
-2. **Borderline Prediabetes (3 patients)**: Patients with HbA1c between 5.7% and 6.4% are held in the separate Clinical Review queue for preventative lifestyle counseling rather than active diabetic recall.
-3. **Subsequent Non-Diabetic Department Visits (36 patients)**: When a diabetic patient visited another specialty (e.g. Dental, ENT, Orthopaedics) after missing a diabetes milestone, we flagged: `[Recent Non-Diabetic Visit: {Dept} on {Date} — Verify if diabetes was reviewed]`. This alerts staff that the patient was physically seen on campus and may have had their diabetes addressed or medication refilled informally.
-4. **Duplicate Registrations (8 patients / 4 pairs)**: Identified pairs with identical demographics (DOB, sex, phone) and matching names (e.g. Joseph Dsouza / Joseph D'Souza, Md. Rafiq / Mohammed Rafiq). Cross-linked with clear alerts to ensure the patient is not contacted twice under different MRNs and to prompt formal EMR chart merging.
-5. **Missing & Shared Phone Numbers (17 patients)**: 8 patients lack any registered contact number (requiring postal address lookup), and 9 share phone numbers across family members (requiring staff to verify identity before discussing sensitive health matters).
+To prevent uninformed front-desk outreach, 23 patients are isolated in **Flagged for Verification** (`export/flagged_verification_patients.csv`):
+1. **Duplicate Registrations (8 patients)**: Flagged for medical records to merge profiles before outreach.
+2. **Unconfirmed Lab-Only Findings (9 patients)**: Elevated labs without clinic diagnosis or medication. Flagged for clinician review before outreach.
+3. **Borderline Prediabetes (3 patients)**: HbA1c 5.7–6.4% held for lifestyle counseling rather than diabetic recall.
+4. **Resolved Postpartum GDM (3 patients)**: Gestational diabetes with medications stopped post-delivery; held for annual OGTT screening.
 
 ---
 
 ## 4. What This Result Cannot Be Trusted For
 
-1. **External Care**: Does not reflect diabetes care, lab tests, or prescriptions received at external clinics, private practitioners, or other hospitals.
-2. **Informal Interactions**: Does not capture phone consultations, WhatsApp messages, or informal hallway conversations with doctors that were not entered into `visits.csv`.
-3. **Atypical Doctor Shorthand**: If a doctor wrote a follow-up interval in an unstandardized format not caught by the parser, the patient falls back to the 4-month rule rather than their specific custom date.
-4. **Diagnostic Authority**: Triage lists are administrative aids for front-desk scheduling and cannot substitute for an attending physician's clinical judgment.
+1. **External Care**: Does not reflect diabetes care, lab tests, or prescriptions received outside St. Vincent Hospital.
+2. **Informal Communications**: Does not capture phone consultations, WhatsApp messages, or hallway conversations not logged in `visits.csv`.
+3. **Unstandardized Shorthand**: Review intervals written in non-standard free text default to the 4-month rule.
+4. **Diagnostic Authority**: This system is an administrative prioritization tool for front-desk scheduling and cannot substitute for clinical judgment.

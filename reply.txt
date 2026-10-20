@@ -1,16 +1,17 @@
 Hi Meenakshi,
 
-We have organized your records into an easy-to-use follow-up portal and two ready-to-call spreadsheets:
+We have organized your records into an easy-to-use follow-up portal and three dedicated spreadsheets:
 
-1. Overdue Call List (58 patients): Patients who missed a scheduled appointment, passed their doctor's review date, or haven't visited in over 4 months. We marked 25 as High Priority because they take insulin or have very high blood sugars—we suggest calling them first.
-2. Due Soon Reminder List (5 patients): Upcoming visits in the next 14 days so your front desk can remind them before they miss their appointment.
+1. Overdue Call List (45 patients): Confirmed diabetic patients whose follow-up is overdue. We marked 24 as High Priority (taking insulin or severe blood sugars) and placed them at the top of your calling queue.
+2. Due Soon Reminder List (5 patients): Patients with appointments due in the next 14 days, helping your team send preventive reminders before appointments lapse.
+3. Flagged for Verification (23 patients): A separate review list for duplicate profiles (e.g., Joseph D'Souza), unconfirmed lab-only findings, and borderline cases so staff do not make uninformed calls.
 
-Important safety protections we put in place:
-• Do Not Call List: We identified 3 deceased patients and 3 who relocated to other hospitals and removed them from the call lists to prevent distressing calls.
-• Doctor Verification Flags: Patients with abnormal lab tests who haven't yet discussed them with a doctor are flagged for clinician review before calling.
-• Front Desk Alerts: We flagged missing phones, shared family numbers, and duplicate registrations (like Joseph D'Souza).
+Key safeguards in place:
+• Do Not Call List: 3 deceased patients and 3 who transferred care were excluded to prevent distressing calls.
+• Diabetes Baseline: Unrelated visits (like Dental or ENT) do not reset diabetic follow-up.
+• Front Desk Flags: Shared family phone numbers and missing contacts are clearly badged.
 
-Your team can launch the portal anytime by running ./run.sh, or download the attached spreadsheets directly. Let us know if you would like any adjustments!
+Your team can launch the portal anytime by running ./run.sh, or open the CSV files directly in Excel.
 
-Best regards,
+Warm regards,  
 mera.health Team
