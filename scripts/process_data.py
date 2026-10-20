@@ -669,6 +669,37 @@ def run_pipeline(export_dir="export", reference_date_str=DEFAULT_REFERENCE_DATE)
             ])
     print(f"[+] Saved Due Soon CSV to: {due_soon_csv_path}")
 
+    # Generate CSV 3: flagged_patients_review.csv (All patients requiring verification)
+    flagged_list = [r for r in classified_patients if r["warning_flags"] and len(r["warning_flags"]) > 0 and r["worklist"] != "EXCLUDED"]
+    flagged_csv_path = os.path.join(export_dir, "flagged_patients_review.csv")
+    with open(flagged_csv_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "MRN", "Name", "Phone", "Follow-Up Worklist", "Priority", "Warning Flags (Reasons For Flagging)",
+            "Reason For Follow-Up", "Clinical Evidence", "Last Visit Date", "Last Department", "Last Doctor"
+        ])
+        # Sort by Overdue first, then priority
+        sorted_flagged = sorted(flagged_list, key=lambda x: (
+            0 if x["worklist"] == "OVERDUE" else (1 if x["worklist"] == "DUE_SOON" else 2),
+            0 if x["priority"] == "HIGH" else 1,
+            -x["days_overdue"]
+        ))
+        for r in sorted_flagged:
+            writer.writerow([
+                r["mrn"],
+                r["name"],
+                r["phone"] or "NO_PHONE",
+                r["worklist"],
+                r["priority"],
+                " | ".join(r["warning_flags"]),
+                r["reason_summary"],
+                "; ".join(r["clinical_evidence"]),
+                r["latest_visit"]["visit_date"] if r["latest_visit"] else "",
+                r["latest_visit"]["department"] if r["latest_visit"] else "",
+                r["latest_visit"]["doctor"] if r["latest_visit"] else ""
+            ])
+    print(f"[+] Saved Flagged Patients CSV to: {flagged_csv_path} ({len(flagged_list)} patients)")
+
 
 if __name__ == "__main__":
     run_pipeline()

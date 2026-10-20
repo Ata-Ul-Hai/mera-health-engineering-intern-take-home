@@ -26,15 +26,18 @@ import {
   PhoneCall,
   Sparkles,
   Users,
-  CheckSquare
+  CheckSquare,
+  Flag
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'ON_TRACK' | 'CLINICAL_REVIEW' | 'EXCLUDED'
+  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'FLAGGED' | 'ON_TRACK' | 'CLINICAL_REVIEW' | 'EXCLUDED'
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('ALL'); // 'ALL' | 'HIGH' | 'MEDIUM'
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
   const [dispositionFilter, setDispositionFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'BOOKED' | 'VOICEMAIL' | 'CALLBACK' | 'WRONG_NUMBER'
+  const [overdueSubFilter, setOverdueSubFilter] = useState('ALL'); // 'ALL' | 'READY' | 'FLAGGED'
+  const [flagTypeFilter, setFlagTypeFilter] = useState('ALL'); // 'ALL' | 'DUPLICATE' | 'MISSING_PHONE' | 'SHARED_PHONE' | 'NON_DIAB_VISIT' | 'LAB_ONLY'
   const [selectedMRN, setSelectedMRN] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState(null);
 
@@ -116,6 +119,12 @@ export default function App() {
     []
   );
 
+  // Dedicated Flagged List (patients needing administrative / clinical verification)
+  const flaggedList = useMemo(
+    () => dataset.patients.filter((p) => p.warning_flags && p.warning_flags.length > 0 && p.worklist !== 'EXCLUDED'),
+    []
+  );
+
   // Departments
   const departments = useMemo(() => {
     const set = new Set();
@@ -132,6 +141,7 @@ export default function App() {
     let list = [];
     if (activeTab === 'OVERDUE') list = [...overdueList];
     else if (activeTab === 'DUE_SOON') list = [...dueSoonList];
+    else if (activeTab === 'FLAGGED') list = [...flaggedList];
     else if (activeTab === 'ON_TRACK') list = [...onTrackList];
     else if (activeTab === 'CLINICAL_REVIEW') list = [...reviewList];
     else if (activeTab === 'EXCLUDED') list = [...excludedList];
@@ -147,8 +157,25 @@ export default function App() {
         if (!matchName && !matchMRN && !matchPhone) return false;
       }
 
+      // Overdue Sub-Filter (Ready to Call vs Flagged)
+      if (activeTab === 'OVERDUE' && overdueSubFilter !== 'ALL') {
+        const hasFlag = p.warning_flags && p.warning_flags.length > 0;
+        if (overdueSubFilter === 'READY' && hasFlag) return false;
+        if (overdueSubFilter === 'FLAGGED' && !hasFlag) return false;
+      }
+
+      // Flag Type Filter (in Flagged tab)
+      if (activeTab === 'FLAGGED' && flagTypeFilter !== 'ALL') {
+        const flags = p.warning_flags || [];
+        if (flagTypeFilter === 'DUPLICATE' && !flags.some((f) => f.startsWith('Duplicate Registration'))) return false;
+        if (flagTypeFilter === 'MISSING_PHONE' && !flags.some((f) => f.startsWith('Missing Phone'))) return false;
+        if (flagTypeFilter === 'SHARED_PHONE' && !flags.some((f) => f.startsWith('Shared Family Phone'))) return false;
+        if (flagTypeFilter === 'NON_DIAB_VISIT' && !flags.some((f) => f.startsWith('Recent Non-Diabetic Visit'))) return false;
+        if (flagTypeFilter === 'LAB_ONLY' && !flags.some((f) => f.startsWith('Lab Diagnosis Only'))) return false;
+      }
+
       // Priority Filter
-      if (activeTab === 'OVERDUE' && priorityFilter !== 'ALL') {
+      if (['OVERDUE', 'FLAGGED'].includes(activeTab) && priorityFilter !== 'ALL') {
         if (p.priority !== priorityFilter) return false;
       }
 
@@ -160,7 +187,7 @@ export default function App() {
       }
 
       // Call Disposition Status Filter (matches all 5 outcomes!)
-      if (['OVERDUE', 'DUE_SOON'].includes(activeTab) && dispositionFilter !== 'ALL') {
+      if (['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) && dispositionFilter !== 'ALL') {
         const currentDisp = callRecords[p.mrn]?.status || 'PENDING';
         if (currentDisp !== dispositionFilter) return false;
       }
@@ -169,7 +196,7 @@ export default function App() {
     });
 
     // Priority Ordering
-    if (activeTab === 'OVERDUE') {
+    if (activeTab === 'OVERDUE' || activeTab === 'FLAGGED') {
       // Sort HIGH priority first, then days_overdue descending
       list.sort((a, b) => {
         if (a.priority === 'HIGH' && b.priority !== 'HIGH') return -1;
@@ -188,9 +215,12 @@ export default function App() {
     priorityFilter,
     departmentFilter,
     dispositionFilter,
+    overdueSubFilter,
+    flagTypeFilter,
     callRecords,
     overdueList,
     dueSoonList,
+    flaggedList,
     onTrackList,
     reviewList,
     excludedList
@@ -226,6 +256,8 @@ export default function App() {
         ? 'overdue_diabetic_patients.csv'
         : activeTab === 'DUE_SOON'
         ? 'due_soon_diabetic_patients.csv'
+        : activeTab === 'FLAGGED'
+        ? 'flagged_patients_review.csv'
         : activeTab === 'ON_TRACK'
         ? 'on_track_diabetic_patients.csv'
         : activeTab === 'CLINICAL_REVIEW'
@@ -279,9 +311,12 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-  // Progress stats
+  // Counts
   const highPriorityTotal = overdueList.filter((p) => p.priority === 'HIGH').length;
   const mediumPriorityTotal = overdueList.filter((p) => p.priority === 'MEDIUM').length;
+  const overdueReadyCount = overdueList.filter((p) => !p.warning_flags || p.warning_flags.length === 0).length;
+  const overdueFlaggedCount = overdueList.filter((p) => p.warning_flags && p.warning_flags.length > 0).length;
+
   const overdueCompletedCount = overdueList.filter(
     (p) => (callRecords[p.mrn]?.status || 'PENDING') !== 'PENDING'
   ).length;
@@ -427,7 +462,12 @@ export default function App() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                background: activeTab === 'DUE_SOON' ? '#059669' : '#1e3a8a',
+                background:
+                  activeTab === 'DUE_SOON'
+                    ? '#059669'
+                    : activeTab === 'FLAGGED'
+                    ? '#b45309'
+                    : '#1e3a8a',
                 color: '#fff',
                 padding: '8px 16px',
                 borderRadius: 8,
@@ -442,6 +482,8 @@ export default function App() {
                 ? 'Export Overdue List (CSV)'
                 : activeTab === 'DUE_SOON'
                 ? 'Export Due Soon List (CSV)'
+                : activeTab === 'FLAGGED'
+                ? 'Export Flagged List (CSV)'
                 : activeTab === 'ON_TRACK'
                 ? 'Export On Track List (CSV)'
                 : 'Export Worklist (CSV)'}
@@ -452,7 +494,7 @@ export default function App() {
 
       {/* Main Workspace */}
       <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Navigation Tabs Bar - All 5 Mutually Exclusive Buckets Totaling Exactly 300 */}
+        {/* Navigation Tabs Bar */}
         <div
           style={{
             display: 'flex',
@@ -537,7 +579,46 @@ export default function App() {
               </span>
             </button>
 
-            {/* 3. On Track / Up to Date Tab */}
+            {/* 3. Dedicated Flagged for Review Tab */}
+            <button
+              onClick={() => {
+                setActiveTab('FLAGGED');
+                setSelectedMRN(null);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 18px',
+                fontSize: '0.88rem',
+                fontWeight: activeTab === 'FLAGGED' ? 700 : 500,
+                color: activeTab === 'FLAGGED' ? '#92400e' : 'var(--text-secondary)',
+                borderBottom: activeTab === 'FLAGGED' ? '2.5px solid #f59e0b' : '2.5px solid transparent',
+                background: activeTab === 'FLAGGED' ? '#fef3c7' : 'transparent',
+                borderRadius: '8px 8px 0 0',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Flag size={16} color={activeTab === 'FLAGGED' ? '#b45309' : '#64748b'} />
+              <span>Flagged for Review</span>
+              <span
+                style={{
+                  background: activeTab === 'FLAGGED' ? '#d97706' : 'var(--bg-subtle)',
+                  color: activeTab === 'FLAGGED' ? '#fff' : 'var(--text-secondary)',
+                  borderRadius: 12,
+                  padding: '1px 8px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700
+                }}
+              >
+                {flaggedList.length}
+              </span>
+              <span className="badge badge-medium" style={{ fontSize: '0.65rem' }}>
+                Verify First
+              </span>
+            </button>
+
+            {/* 4. On Track / Up to Date Tab */}
             <button
               onClick={() => {
                 setActiveTab('ON_TRACK');
@@ -573,7 +654,7 @@ export default function App() {
               </span>
             </button>
 
-            {/* 4. Clinical Review Tab */}
+            {/* 5. Clinical Review Tab */}
             <button
               onClick={() => {
                 setActiveTab('CLINICAL_REVIEW');
@@ -594,7 +675,7 @@ export default function App() {
               }}
             >
               <Stethoscope size={16} color={activeTab === 'CLINICAL_REVIEW' ? '#7c3aed' : '#64748b'} />
-              <span>Clinical Review Queue</span>
+              <span>Borderline Queue</span>
               <span
                 style={{
                   background: activeTab === 'CLINICAL_REVIEW' ? '#7c3aed' : 'var(--bg-subtle)',
@@ -609,7 +690,7 @@ export default function App() {
               </span>
             </button>
 
-            {/* 5. Excluded Guardrails Tab */}
+            {/* 6. Excluded Guardrails Tab */}
             <button
               onClick={() => {
                 setActiveTab('EXCLUDED');
@@ -655,6 +736,8 @@ export default function App() {
                 ? '#fff1f2'
                 : activeTab === 'DUE_SOON'
                 ? '#f0fdf4'
+                : activeTab === 'FLAGGED'
+                ? '#fffbeb'
                 : activeTab === 'ON_TRACK'
                 ? '#eff6ff'
                 : activeTab === 'CLINICAL_REVIEW'
@@ -665,6 +748,8 @@ export default function App() {
                 ? '#fecdd3'
                 : activeTab === 'DUE_SOON'
                 ? '#bbf7d0'
+                : activeTab === 'FLAGGED'
+                ? '#fde68a'
                 : activeTab === 'ON_TRACK'
                 ? '#bfdbfe'
                 : activeTab === 'CLINICAL_REVIEW'
@@ -684,12 +769,18 @@ export default function App() {
           <div>
             {activeTab === 'OVERDUE' && (
               <span>
-                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits. Patients are indexed in priority order (High Priority first, followed by days overdue).
+                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits. Use the sub-filter below to toggle between{' '}
+                <strong>Ready to Call ({overdueReadyCount} unflagged)</strong> and <strong>Flagged for Verification ({overdueFlaggedCount})</strong>.
               </span>
             )}
             {activeTab === 'DUE_SOON' && (
               <span>
                 <strong>Front Desk Directive:</strong> Preventive reminder calls. These patients have scheduled appointments or review targets within the next 14 days or are approaching 4 months. Calling them now prevents missed appointments.
+              </span>
+            )}
+            {activeTab === 'FLAGGED' && (
+              <span>
+                <strong>Administrative & Clinical Caution:</strong> Patients on this list carry specific warning flags (duplicate registrations, shared numbers, missing phones, recent non-diabetic visits, or lab-only diagnoses). Review the flag before dialing to prevent calling the wrong person or disclosing uncommunicated diagnoses.
               </span>
             )}
             {activeTab === 'ON_TRACK' && (
@@ -726,7 +817,7 @@ export default function App() {
           }}
         >
           {/* Search Input */}
-          <div style={{ position: 'relative', flex: '1 1 280px' }}>
+          <div style={{ position: 'relative', flex: '1 1 240px' }}>
             <Search
               size={15}
               color="var(--text-muted)"
@@ -734,7 +825,7 @@ export default function App() {
             />
             <input
               type="text"
-              placeholder="Search by patient name, MRN, phone number..."
+              placeholder="Search patient, MRN, phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -750,8 +841,83 @@ export default function App() {
             />
           </div>
 
-          {/* Priority Filter (Overdue tab) */}
+          {/* Overdue Sub-Filter Toggle (in Overdue tab) */}
           {activeTab === 'OVERDUE' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--bg-subtle)', padding: 3, borderRadius: 6, border: '1px solid var(--border-medium)' }}>
+              <button
+                onClick={() => setOverdueSubFilter('ALL')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 4,
+                  fontSize: '0.78rem',
+                  fontWeight: overdueSubFilter === 'ALL' ? 700 : 500,
+                  background: overdueSubFilter === 'ALL' ? 'var(--bg-surface)' : 'transparent',
+                  color: overdueSubFilter === 'ALL' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  boxShadow: overdueSubFilter === 'ALL' ? 'var(--shadow-sm)' : 'none'
+                }}
+              >
+                All Overdue ({overdueList.length})
+              </button>
+              <button
+                onClick={() => setOverdueSubFilter('READY')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 4,
+                  fontSize: '0.78rem',
+                  fontWeight: overdueSubFilter === 'READY' ? 700 : 500,
+                  background: overdueSubFilter === 'READY' ? 'var(--bg-surface)' : 'transparent',
+                  color: overdueSubFilter === 'READY' ? '#15803d' : 'var(--text-secondary)',
+                  boxShadow: overdueSubFilter === 'READY' ? 'var(--shadow-sm)' : 'none'
+                }}
+              >
+                ✅ Ready to Call ({overdueReadyCount})
+              </button>
+              <button
+                onClick={() => setOverdueSubFilter('FLAGGED')}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: 4,
+                  fontSize: '0.78rem',
+                  fontWeight: overdueSubFilter === 'FLAGGED' ? 700 : 500,
+                  background: overdueSubFilter === 'FLAGGED' ? 'var(--bg-surface)' : 'transparent',
+                  color: overdueSubFilter === 'FLAGGED' ? '#b45309' : 'var(--text-secondary)',
+                  boxShadow: overdueSubFilter === 'FLAGGED' ? 'var(--shadow-sm)' : 'none'
+                }}
+              >
+                ⚠️ Flagged ({overdueFlaggedCount})
+              </button>
+            </div>
+          )}
+
+          {/* Flag Type Sub-Filter (in Flagged tab) */}
+          {activeTab === 'FLAGGED' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Flag Type:</span>
+              <select
+                value={flagTypeFilter}
+                onChange={(e) => setFlagTypeFilter(e.target.value)}
+                style={{
+                  background: 'var(--bg-canvas)',
+                  border: '1px solid var(--border-medium)',
+                  color: 'var(--text-primary)',
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  fontSize: '0.8rem',
+                  fontWeight: 500
+                }}
+              >
+                <option value="ALL">All Warning Types ({flaggedList.length})</option>
+                <option value="DUPLICATE">⚠️ Duplicate Registrations (8)</option>
+                <option value="MISSING_PHONE">📞 Missing Phone Numbers (8)</option>
+                <option value="SHARED_PHONE">👥 Shared Family Phones (9)</option>
+                <option value="NON_DIAB_VISIT">🏥 Recent Non-Diabetic Visits (36)</option>
+                <option value="LAB_ONLY">🧪 Lab Diagnosis Only (11)</option>
+              </select>
+            </div>
+          )}
+
+          {/* Priority Filter */}
+          {['OVERDUE', 'FLAGGED'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Priority:</span>
               <select
@@ -768,14 +934,14 @@ export default function App() {
                 }}
               >
                 <option value="ALL">All Priorities</option>
-                <option value="HIGH">🔴 High Priority ({highPriorityTotal})</option>
-                <option value="MEDIUM">🟡 Medium Priority ({mediumPriorityTotal})</option>
+                <option value="HIGH">🔴 High Priority</option>
+                <option value="MEDIUM">🟡 Medium Priority</option>
               </select>
             </div>
           )}
 
           {/* Call Status Filter matching all 5 disposition states */}
-          {['OVERDUE', 'DUE_SOON'].includes(activeTab) && (
+          {['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Call Outcome:</span>
               <select
@@ -882,7 +1048,7 @@ export default function App() {
 
                         {/* Call Outcome Selector */}
                         <td onClick={(e) => e.stopPropagation()}>
-                          {['OVERDUE', 'DUE_SOON'].includes(activeTab) ? (
+                          {['OVERDUE', 'DUE_SOON', 'FLAGGED'].includes(activeTab) ? (
                             <select
                               value={disp}
                               onChange={(e) => updateDisposition(patient.mrn, e.target.value)}
@@ -930,7 +1096,7 @@ export default function App() {
 
                         {/* Priority / Time Metric */}
                         <td>
-                          {activeTab === 'OVERDUE' && (
+                          {['OVERDUE', 'FLAGGED'].includes(activeTab) && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                               {patient.priority === 'HIGH' ? (
                                 <span className="badge badge-urgent">
@@ -944,7 +1110,7 @@ export default function App() {
                                 </span>
                               )}
                               <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                                {patient.days_overdue}d overdue
+                                {patient.days_overdue > 0 ? `${patient.days_overdue}d overdue` : `${patient.days_until}d remaining`}
                               </span>
                             </div>
                           )}

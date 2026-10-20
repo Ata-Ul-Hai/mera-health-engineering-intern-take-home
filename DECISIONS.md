@@ -14,7 +14,7 @@ The email asks for "diabetic patients". We defined a diabetic patient through fo
 1. **Diabetology Department**: Any patient who attended the Diabetology specialty.
 2. **Antidiabetic Medications**: Any patient prescribed insulin (Glargine, Aspart, Degludec, Lispro, Mixtard) or oral hypoglycemic agents (Metformin, Glimepiride, Gliclazide, Sitagliptin, Vildagliptin, Dapagliflozin).
 3. **Clinical Notes (Negation-Filtered)**: Documented diagnosis of Type 1, Type 2, or gestational diabetes (e.g., `T2DM`, `type 2 diabetes`, `k/c/o DM`, `known diabetic`) across any department.
-4. **Lab Findings**: Patients with lab tests in the diabetic range (HbA1c $\ge 6.5\%$, FBS $\ge 126$ mg/dL) who lack clinic notes or prescriptions are categorized as *Diabetic (Lab Findings)*, but flagged with a mandatory warning badge requiring clinician verification before calling.
+4. **Lab Findings**: Patients with lab tests in the diabetic range (HbA1c ≥ 6.5%, FBS ≥ 126 mg/dL) who lack clinic notes or prescriptions are categorized as *Diabetic (Lab Findings)*, but flagged with a mandatory warning badge requiring clinician verification before calling.
 *Why*: Excluding non-diabetology notes would miss 36 diabetic patients managed in General Medicine or other departments. Conversely, naive keyword searching falsely identifies patients whose notes state *"Denies diabetes"* or *"Father diabetic"*.
 
 ### "Overdue for Follow-Up"
@@ -27,11 +27,17 @@ Evaluated strictly against the patient's **active baseline** (superseding older 
 To optimize front-desk calling queues, overdue patients are indexed in priority order:
 - **🔴 High Priority (25 patients)**: Overdue patients with acute clinical vulnerability:
   1. Prescribed **Insulin** (Inj. Insulin Glargine, Aspart, Degludec, Lispro, Mixtard) — lapse in insulin therapy carries immediate risk of severe hyperglycemia or diabetic ketoacidosis (DKA).
-  2. Laboratory **HbA1c $\ge 9.0\%$** or blood sugar $\ge 250$ mg/dL.
+  2. Laboratory **HbA1c ≥ 9.0%** or blood sugar ≥ 250 mg/dL.
   3. Physician notes documenting uncontrolled glycemic status (*"sugars running high"*, *"sugars not under control"*, *"c/o burning soles"*).
   *Indexed first, sorted by days overdue descending.*
 - **🟡 Medium Priority (33 patients)**: Overdue patients on standard oral medications (Metformin, Glimepiride) without severe hyperglycemia or acute notes, sorted by days overdue descending.
 - **🟢 Due Soon (5 patients)**: Scheduled appointment or note review target within the next 14 days, or approaching 4 months since last contact, sorted by days remaining ascending.
+
+### "Dedicated Flagged Review List & Segmentation"
+Putting flagged patients directly into an unsegmented calling queue risks front-desk staff calling unaware of critical clinical or administrative caveats. To eliminate this risk:
+1. **Dedicated Tab (`Flagged for Review`)**: Surfaces all 55 diabetic patients who carry warning flags, filterable by specific flag types: Duplicate Registrations (8), Missing Phone Numbers (8), Shared Family Phones (9), Subsequent Non-Diabetic Visits (36), and Lab-Only Diagnoses (11).
+2. **Overdue Sub-Filter (`Ready to Call` vs `Flagged`)**: In the Overdue tab, front desk staff can filter directly between **Ready to Call (25 clean patients)** and **Flagged for Review (33 patients)** with a single click.
+3. **Dedicated CSV Export (`export/flagged_patients_review.csv`)**: Generated alongside `overdue_diabetic_patients.csv` and `due_soon_diabetic_patients.csv` to allow medical records and senior staff to audit and resolve flagged cases offline.
 
 ### "Front Desk Call Outcomes (Dispositions)"
 To support front-desk workflow, every call is tracked with five mutually exclusive operational states:
@@ -80,10 +86,13 @@ Every patient belongs to exactly one mutually exclusive bucket whose sum equals 
 
 ## 3. Where We Flagged for Human / Clinical Review
 
-1. **Abnormal Lab-Only Diagnoses**: Patients with elevated diabetic lab results (e.g. HbA1c $\ge 6.5\%$) without a prior clinic note or prescription. We classified them as diabetic via lab findings, but flagged them with: `[Lab Diagnosis Only - Clinician verification recommended before call]` so the front desk does not call cold without physician confirmation.
-2. **Borderline Prediabetes**: Patients with HbA1c between 5.7% and 6.4% were placed into the Clinical Review queue for lifestyle counseling rather than active diabetic recall.
-3. **Subsequent Non-Diabetic Department Visits**: When a diabetic patient visited another specialty (e.g. Dental, ENT, Orthopaedics) after missing a diabetes milestone, we flagged: `[Recent Non-Diabetic Visit: {Dept} on {Date} — Verify if diabetes was reviewed]`.
-4. **Duplicate Records**: Flagged for medical records staff to verify and merge formally in the hospital EMR.
+To prevent front-desk staff from making uninformed calls, five categories of patients are flagged for human review and isolated into both a dedicated UI list and a specialized export (`export/flagged_patients_review.csv`):
+
+1. **Abnormal Lab-Only Diagnoses (11 patients)**: Patients with elevated diabetic lab results (e.g. HbA1c ≥ 6.5%, FBS ≥ 126 mg/dL) without an in-system diabetes clinic note or prescription. Classified as diabetic based on clinical test results, but flagged with `[Lab Diagnosis Only - Clinician verification recommended before call]` so staff confirm clinical diagnosis with an attending doctor prior to outreach.
+2. **Borderline Prediabetes (3 patients)**: Patients with HbA1c between 5.7% and 6.4% are held in the separate Clinical Review queue for preventative lifestyle counseling rather than active diabetic recall.
+3. **Subsequent Non-Diabetic Department Visits (36 patients)**: When a diabetic patient visited another specialty (e.g. Dental, ENT, Orthopaedics) after missing a diabetes milestone, we flagged: `[Recent Non-Diabetic Visit: {Dept} on {Date} — Verify if diabetes was reviewed]`. This alerts staff that the patient was physically seen on campus and may have had their diabetes addressed or medication refilled informally.
+4. **Duplicate Registrations (8 patients / 4 pairs)**: Identified pairs with identical demographics (DOB, sex, phone) and matching names (e.g. Joseph Dsouza / Joseph D'Souza, Md. Rafiq / Mohammed Rafiq). Cross-linked with clear alerts to ensure the patient is not contacted twice under different MRNs and to prompt formal EMR chart merging.
+5. **Missing & Shared Phone Numbers (17 patients)**: 8 patients lack any registered contact number (requiring postal address lookup), and 9 share phone numbers across family members (requiring staff to verify identity before discussing sensitive health matters).
 
 ---
 
