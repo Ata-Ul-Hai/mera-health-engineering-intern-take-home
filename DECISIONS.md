@@ -2,8 +2,15 @@
 
 ## 1. Terms Defined from the Request
 
+### "System / Reference Date (2026-10-01)"
+The hospital export does not specify an evaluation timestamp. We established **October 1, 2026 (`2026-10-01`)** as the system baseline based on chronological evidence:
+- The latest recorded visit in `visits.csv` occurred on `2026-09-29`.
+- The latest prescription in `prescriptions.csv` was dispensed on `2026-09-29`.
+- The request email from Meenakshi was received in early October 2026.
+Choosing `2026-10-01` accurately represents the hospital's snapshot date when the data was extracted.
+
 ### "Diabetic"
-The email simply asks for "diabetic patients". In healthcare data, diabetes cannot be identified through naive keyword matching without causing significant errors. We defined a diabetic patient as anyone meeting at least one of these clinical criteria:
+The email asks for "diabetic patients". We defined a diabetic patient through four clinical criteria:
 1. **Diabetology Department**: Any patient who attended the Diabetology specialty.
 2. **Antidiabetic Medications**: Any patient prescribed insulin (Glargine, Aspart, Degludec, Lispro, Mixtard) or oral hypoglycemic agents (Metformin, Glimepiride, Gliclazide, Sitagliptin, Vildagliptin, Dapagliflozin).
 3. **Clinical Notes (Negation-Filtered)**: Documented diagnosis of Type 1, Type 2, or gestational diabetes (e.g., `T2DM`, `type 2 diabetes`, `k/c/o DM`, `known diabetic`) across any department.
@@ -11,13 +18,37 @@ The email simply asks for "diabetic patients". In healthcare data, diabetes cann
 *Why*: Excluding non-diabetology notes would miss 36 diabetic patients managed in General Medicine or other departments. Conversely, naive keyword searching falsely identifies patients whose notes state *"Denies diabetes"* or *"Father diabetic"*.
 
 ### "Overdue for Follow-Up"
-The hospital export does not contain an explicit "overdue" column. We established a 3-tier hierarchy evaluated strictly against the patient's **active baseline** (superseding older missed dates if the patient returned on a later date):
+Evaluated strictly against the patient's **active baseline** (superseding older missed dates if the patient returned on a later date):
 * **Tier 1 (Explicit Appointment)**: If a `next_appointment` was scheduled and the date has passed with no subsequent visit, the patient is overdue.
 * **Tier 2 (Doctor Review Interval in Notes)**: If no appointment date was booked, but the doctor wrote a review timeframe (e.g., *"review 6 wks"*, *"r/v 3/12"* = 90 days, *"review after 3 months"*), that calculated target date determines overdue status.
 * **Tier 3 (Clinical Fallback)**: If neither an appointment nor a review timeframe was recorded, standard diabetes guidelines recommend evaluation every 3 to 6 months. We set a threshold of $> 4$ months (120 days) since the last visit without follow-up.
 
-### "Due Soon" (Completely Separate Workflow)
-Maintained as a separate list and distinct CSV export (`due_soon_diabetic_patients.csv`). It captures patients whose appointment or review target is approaching within the next 14 days, or who are between 3.5 and 4 months since last contact. Calling them acts as a preventive reminder rather than an overdue recall.
+### "Priority Ordering"
+To optimize front-desk calling queues, overdue patients are indexed in priority order:
+- **🔴 High Priority (25 patients)**: Overdue patients with acute clinical vulnerability:
+  1. Prescribed **Insulin** (Inj. Insulin Glargine, Aspart, Degludec, Lispro, Mixtard) — lapse in insulin therapy carries immediate risk of severe hyperglycemia or diabetic ketoacidosis (DKA).
+  2. Laboratory **HbA1c $\ge 9.0\%$** or blood sugar $\ge 250$ mg/dL.
+  3. Physician notes documenting uncontrolled glycemic status (*"sugars running high"*, *"sugars not under control"*, *"c/o burning soles"*).
+  *Indexed first, sorted by days overdue descending.*
+- **🟡 Medium Priority (33 patients)**: Overdue patients on standard oral medications (Metformin, Glimepiride) without severe hyperglycemia or acute notes, sorted by days overdue descending.
+- **🟢 Due Soon (5 patients)**: Scheduled appointment or note review target within the next 14 days, or approaching 4 months since last contact, sorted by days remaining ascending.
+
+### "Front Desk Call Outcomes (Dispositions)"
+To support front-desk workflow, every call is tracked with five mutually exclusive operational states:
+1. `To Call (Pending)`: Default queue state; patient has not yet been dialed.
+2. `Booked / Rescheduled`: Patient reached; follow-up appointment successfully agreed and scheduled.
+3. `Voicemail / Left Msg`: Call attempted; voicemail left or message taken by an adult household member.
+4. `Callback Requested`: Patient reached but requested a return call at a specific later time.
+5. `Wrong / Inactive`: Number invalid, disconnected, or wrong person; automatically flags the chart for medical records to verify contact details.
+
+### "Complete Bucket Partition (Exactly 300 Patients)"
+Every patient belongs to exactly one mutually exclusive bucket whose sum equals the total 300 patients:
+- 📞 **Overdue Call List**: **58** (Target date passed without follow-up; active call list)
+- ⏳ **Due Soon Reminder List**: **5** (Target date in next 14 days; preventive reminder calls)
+- 🩺 **On Track / Up to Date**: **37** (Diabetic patients seen recently or appointment scheduled in future)
+- 🔍 **Clinical Review Queue**: **3** (Borderline prediabetes HbA1c 5.7–6.4% needing lifestyle counseling)
+- ⛔ **Excluded Guardrails**: **197** (3 Deceased, 3 Transferred Care, 191 Confirmed Non-Diabetic Screenings)
+**Total: $58 + 5 + 37 + 3 + 197 = 300$ patients.**
 
 ---
 
@@ -49,7 +80,7 @@ Maintained as a separate list and distinct CSV export (`due_soon_diabetic_patien
 
 ## 3. Where We Flagged for Human / Clinical Review
 
-1. **Abnormal Lab-Only Diagnoses**: 5 patients had elevated diabetic lab results (e.g. HbA1c $\ge 6.5\%$) without a prior clinic note or prescription. We classified them as diabetic via lab findings, but flagged them with: `[Lab Diagnosis Only - Clinician verification recommended before call]` so the front desk does not call cold without physician confirmation.
+1. **Abnormal Lab-Only Diagnoses**: Patients with elevated diabetic lab results (e.g. HbA1c $\ge 6.5\%$) without a prior clinic note or prescription. We classified them as diabetic via lab findings, but flagged them with: `[Lab Diagnosis Only - Clinician verification recommended before call]` so the front desk does not call cold without physician confirmation.
 2. **Borderline Prediabetes**: Patients with HbA1c between 5.7% and 6.4% were placed into the Clinical Review queue for lifestyle counseling rather than active diabetic recall.
 3. **Subsequent Non-Diabetic Department Visits**: When a diabetic patient visited another specialty (e.g. Dental, ENT, Orthopaedics) after missing a diabetes milestone, we flagged: `[Recent Non-Diabetic Visit: {Dept} on {Date} — Verify if diabetes was reviewed]`.
 4. **Duplicate Records**: Flagged for medical records staff to verify and merge formally in the hospital EMR.

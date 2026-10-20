@@ -24,15 +24,17 @@ import {
   ChevronDown,
   Layers,
   PhoneCall,
-  Sparkles
+  Sparkles,
+  Users,
+  CheckSquare
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'CLINICAL_REVIEW' | 'EXCLUDED'
+  const [activeTab, setActiveTab] = useState('OVERDUE'); // 'OVERDUE' | 'DUE_SOON' | 'ON_TRACK' | 'CLINICAL_REVIEW' | 'EXCLUDED'
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('ALL'); // 'ALL' | 'HIGH' | 'MEDIUM'
   const [departmentFilter, setDepartmentFilter] = useState('ALL');
-  const [dispositionFilter, setDispositionFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'COMPLETED'
+  const [dispositionFilter, setDispositionFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'BOOKED' | 'VOICEMAIL' | 'CALLBACK' | 'WRONG_NUMBER'
   const [selectedMRN, setSelectedMRN] = useState(null);
   const [copiedPhone, setCopiedPhone] = useState(null);
 
@@ -92,7 +94,7 @@ export default function App() {
     setTimeout(() => setCopiedPhone(null), 2000);
   };
 
-  // Distinct Lists from Dataset
+  // Distinct Mutually Exclusive Lists from Dataset (Sum = 300)
   const overdueList = useMemo(
     () => dataset.patients.filter((p) => p.worklist === 'OVERDUE'),
     []
@@ -101,13 +103,12 @@ export default function App() {
     () => dataset.patients.filter((p) => p.worklist === 'DUE_SOON'),
     []
   );
+  const onTrackList = useMemo(
+    () => dataset.patients.filter((p) => p.worklist === 'ON_TRACK'),
+    []
+  );
   const reviewList = useMemo(
-    () =>
-      dataset.patients.filter(
-        (p) =>
-          p.worklist === 'CLINICAL_REVIEW' ||
-          (p.is_lab_only_diagnosis && ['OVERDUE', 'DUE_SOON'].includes(p.worklist))
-      ),
+    () => dataset.patients.filter((p) => p.worklist === 'CLINICAL_REVIEW'),
     []
   );
   const excludedList = useMemo(
@@ -126,15 +127,17 @@ export default function App() {
     return Array.from(set).sort();
   }, []);
 
-  // Filtered List based on Current Tab and Controls
+  // Filtered and Priority-Ordered List
   const currentList = useMemo(() => {
     let list = [];
-    if (activeTab === 'OVERDUE') list = overdueList;
-    else if (activeTab === 'DUE_SOON') list = dueSoonList;
-    else if (activeTab === 'CLINICAL_REVIEW') list = reviewList;
-    else if (activeTab === 'EXCLUDED') list = excludedList;
+    if (activeTab === 'OVERDUE') list = [...overdueList];
+    else if (activeTab === 'DUE_SOON') list = [...dueSoonList];
+    else if (activeTab === 'ON_TRACK') list = [...onTrackList];
+    else if (activeTab === 'CLINICAL_REVIEW') list = [...reviewList];
+    else if (activeTab === 'EXCLUDED') list = [...excludedList];
 
-    return list.filter((p) => {
+    // Filter
+    list = list.filter((p) => {
       // Search
       if (searchTerm) {
         const q = searchTerm.toLowerCase();
@@ -144,27 +147,41 @@ export default function App() {
         if (!matchName && !matchMRN && !matchPhone) return false;
       }
 
-      // Priority
+      // Priority Filter
       if (activeTab === 'OVERDUE' && priorityFilter !== 'ALL') {
         if (p.priority !== priorityFilter) return false;
       }
 
-      // Department
+      // Department Filter
       if (departmentFilter !== 'ALL') {
         if (!p.latest_visit || p.latest_visit.department !== departmentFilter) {
           return false;
         }
       }
 
-      // Call Disposition Status
+      // Call Disposition Status Filter (matches all 5 outcomes!)
       if (['OVERDUE', 'DUE_SOON'].includes(activeTab) && dispositionFilter !== 'ALL') {
         const currentDisp = callRecords[p.mrn]?.status || 'PENDING';
-        if (dispositionFilter === 'PENDING' && currentDisp !== 'PENDING') return false;
-        if (dispositionFilter === 'COMPLETED' && currentDisp === 'PENDING') return false;
+        if (currentDisp !== dispositionFilter) return false;
       }
 
       return true;
     });
+
+    // Priority Ordering
+    if (activeTab === 'OVERDUE') {
+      // Sort HIGH priority first, then days_overdue descending
+      list.sort((a, b) => {
+        if (a.priority === 'HIGH' && b.priority !== 'HIGH') return -1;
+        if (a.priority !== 'HIGH' && b.priority === 'HIGH') return 1;
+        return b.days_overdue - a.days_overdue;
+      });
+    } else if (activeTab === 'DUE_SOON') {
+      // Sort by days_until ascending (most imminent first)
+      list.sort((a, b) => a.days_until - b.days_until);
+    }
+
+    return list;
   }, [
     activeTab,
     searchTerm,
@@ -174,6 +191,7 @@ export default function App() {
     callRecords,
     overdueList,
     dueSoonList,
+    onTrackList,
     reviewList,
     excludedList
   ]);
@@ -208,11 +226,14 @@ export default function App() {
         ? 'overdue_diabetic_patients.csv'
         : activeTab === 'DUE_SOON'
         ? 'due_soon_diabetic_patients.csv'
+        : activeTab === 'ON_TRACK'
+        ? 'on_track_diabetic_patients.csv'
         : activeTab === 'CLINICAL_REVIEW'
         ? 'clinical_review_diabetic_patients.csv'
         : 'excluded_patients.csv';
 
     const headers = [
+      'Queue Index',
       'MRN',
       'Name',
       'Phone',
@@ -229,7 +250,8 @@ export default function App() {
       'Front Desk Notes'
     ];
 
-    const rows = currentList.map((p) => [
+    const rows = currentList.map((p, idx) => [
+      idx + 1,
       `"${p.mrn}"`,
       `"${p.name}"`,
       `"${p.phone || 'NO_PHONE'}"`,
@@ -259,6 +281,7 @@ export default function App() {
 
   // Progress stats
   const highPriorityTotal = overdueList.filter((p) => p.priority === 'HIGH').length;
+  const mediumPriorityTotal = overdueList.filter((p) => p.priority === 'MEDIUM').length;
   const overdueCompletedCount = overdueList.filter(
     (p) => (callRecords[p.mrn]?.status || 'PENDING') !== 'PENDING'
   ).length;
@@ -325,6 +348,26 @@ export default function App() {
 
           {/* Operational Metrics & As-Of Date */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            {/* Total Patients Reconciled Badge */}
+            <div
+              style={{
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border-light)',
+                borderRadius: 8,
+                padding: '6px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6
+              }}
+              title="300 Total = 58 Overdue + 5 Due Soon + 37 On Track + 3 Review + 197 Excluded"
+            >
+              <Users size={14} color="#64748b" />
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Total Export:</span>
+              <span className="mono" style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                300 Patients
+              </span>
+            </div>
+
             {/* Progress Counter */}
             <div
               style={{
@@ -399,6 +442,8 @@ export default function App() {
                 ? 'Export Overdue List (CSV)'
                 : activeTab === 'DUE_SOON'
                 ? 'Export Due Soon List (CSV)'
+                : activeTab === 'ON_TRACK'
+                ? 'Export On Track List (CSV)'
                 : 'Export Worklist (CSV)'}
             </button>
           </div>
@@ -407,7 +452,7 @@ export default function App() {
 
       {/* Main Workspace */}
       <div style={{ maxWidth: 1440, margin: '0 auto', width: '100%', padding: '20px 24px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Navigation Tabs Bar */}
+        {/* Navigation Tabs Bar - All 5 Mutually Exclusive Buckets Totaling Exactly 300 */}
         <div
           style={{
             display: 'flex',
@@ -420,7 +465,7 @@ export default function App() {
           }}
         >
           <div style={{ display: 'flex', gap: 6 }}>
-            {/* Overdue Call List Tab */}
+            {/* 1. Overdue Call List Tab */}
             <button
               onClick={() => {
                 setActiveTab('OVERDUE');
@@ -456,7 +501,7 @@ export default function App() {
               </span>
             </button>
 
-            {/* Due Soon Reminder List Tab */}
+            {/* 2. Due Soon Reminder List Tab */}
             <button
               onClick={() => {
                 setActiveTab('DUE_SOON');
@@ -490,12 +535,45 @@ export default function App() {
               >
                 {dueSoonList.length}
               </span>
-              <span className="badge badge-success" style={{ fontSize: '0.65rem' }}>
-                Next 14 Days
+            </button>
+
+            {/* 3. On Track / Up to Date Tab */}
+            <button
+              onClick={() => {
+                setActiveTab('ON_TRACK');
+                setSelectedMRN(null);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 18px',
+                fontSize: '0.88rem',
+                fontWeight: activeTab === 'ON_TRACK' ? 700 : 500,
+                color: activeTab === 'ON_TRACK' ? '#1d4ed8' : 'var(--text-secondary)',
+                borderBottom: activeTab === 'ON_TRACK' ? '2.5px solid #2563eb' : '2.5px solid transparent',
+                background: activeTab === 'ON_TRACK' ? 'var(--primary-subtle)' : 'transparent',
+                borderRadius: '8px 8px 0 0',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <CheckSquare size={16} color={activeTab === 'ON_TRACK' ? '#2563eb' : '#64748b'} />
+              <span>On Track / Up to Date</span>
+              <span
+                style={{
+                  background: activeTab === 'ON_TRACK' ? '#2563eb' : 'var(--bg-subtle)',
+                  color: activeTab === 'ON_TRACK' ? '#fff' : 'var(--text-secondary)',
+                  borderRadius: 12,
+                  padding: '1px 8px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700
+                }}
+              >
+                {onTrackList.length}
               </span>
             </button>
 
-            {/* Clinical Review Tab */}
+            {/* 4. Clinical Review Tab */}
             <button
               onClick={() => {
                 setActiveTab('CLINICAL_REVIEW');
@@ -531,7 +609,7 @@ export default function App() {
               </span>
             </button>
 
-            {/* Excluded Guardrails Tab */}
+            {/* 5. Excluded Guardrails Tab */}
             <button
               onClick={() => {
                 setActiveTab('EXCLUDED');
@@ -577,6 +655,8 @@ export default function App() {
                 ? '#fff1f2'
                 : activeTab === 'DUE_SOON'
                 ? '#f0fdf4'
+                : activeTab === 'ON_TRACK'
+                ? '#eff6ff'
                 : activeTab === 'CLINICAL_REVIEW'
                 ? '#faf5ff'
                 : '#f8fafc',
@@ -585,6 +665,8 @@ export default function App() {
                 ? '#fecdd3'
                 : activeTab === 'DUE_SOON'
                 ? '#bbf7d0'
+                : activeTab === 'ON_TRACK'
+                ? '#bfdbfe'
                 : activeTab === 'CLINICAL_REVIEW'
                 ? '#e9d5ff'
                 : '#cbd5e1'
@@ -602,7 +684,7 @@ export default function App() {
           <div>
             {activeTab === 'OVERDUE' && (
               <span>
-                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits.
+                <strong>Front Desk Directive:</strong> Call overdue patients to book follow-up visits. Patients are indexed in priority order (High Priority first, followed by days overdue).
               </span>
             )}
             {activeTab === 'DUE_SOON' && (
@@ -610,14 +692,19 @@ export default function App() {
                 <strong>Front Desk Directive:</strong> Preventive reminder calls. These patients have scheduled appointments or review targets within the next 14 days or are approaching 4 months. Calling them now prevents missed appointments.
               </span>
             )}
+            {activeTab === 'ON_TRACK' && (
+              <span>
+                <strong>System Status:</strong> Diabetic patients whose care is up to date (seen recently or appointment scheduled in the future). No recall action required.
+              </span>
+            )}
             {activeTab === 'CLINICAL_REVIEW' && (
               <span>
-                <strong>Doctor Directive:</strong> Review before calling. These patients had abnormal screening lab tests (or borderline prediabetes) but lack an OPD diagnosis note. Confirm diagnosis before front desk initiates contact.
+                <strong>Doctor Directive:</strong> Review before calling. These patients have borderline prediabetes (HbA1c 5.7–6.4% or impaired fasting glucose) requiring clinical lifestyle advice rather than active recall.
               </span>
             )}
             {activeTab === 'EXCLUDED' && (
               <span>
-                <strong>Audit Directive:</strong> 3 deceased patients, 3 transferred-care patients, and confirmed non-diabetic screening patients are protected here with full clinical documentation.
+                <strong>Audit Directive:</strong> 3 deceased patients, 3 transferred-care patients, and 191 confirmed non-diabetic screening patients are protected here with full clinical documentation.
               </span>
             )}
           </div>
@@ -682,15 +769,15 @@ export default function App() {
               >
                 <option value="ALL">All Priorities</option>
                 <option value="HIGH">🔴 High Priority ({highPriorityTotal})</option>
-                <option value="MEDIUM">🟡 Medium Priority ({overdueList.length - highPriorityTotal})</option>
+                <option value="MEDIUM">🟡 Medium Priority ({mediumPriorityTotal})</option>
               </select>
             </div>
           )}
 
-          {/* Call Status Filter */}
+          {/* Call Status Filter matching all 5 disposition states */}
           {['OVERDUE', 'DUE_SOON'].includes(activeTab) && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Call Status:</span>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 600 }}>Call Outcome:</span>
               <select
                 value={dispositionFilter}
                 onChange={(e) => setDispositionFilter(e.target.value)}
@@ -704,9 +791,12 @@ export default function App() {
                   fontWeight: 500
                 }}
               >
-                <option value="ALL">All Statuses</option>
-                <option value="PENDING">Pending Call</option>
-                <option value="COMPLETED">Call Handled</option>
+                <option value="ALL">All Call Outcomes</option>
+                <option value="PENDING">⏳ To Call (Pending)</option>
+                <option value="BOOKED">✅ Booked / Rescheduled</option>
+                <option value="VOICEMAIL">📩 Voicemail / Left Msg</option>
+                <option value="CALLBACK">🔄 Callback Requested</option>
+                <option value="WRONG_NUMBER">❌ Wrong / Inactive</option>
               </select>
             </div>
           )}
@@ -742,7 +832,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Data Table Workspace */}
+        {/* Data Table Workspace with Priority Index (#) */}
         <div
           style={{
             background: 'var(--bg-surface)',
@@ -756,27 +846,27 @@ export default function App() {
             <table className="clinical-table">
               <thead>
                 <tr>
+                  <th style={{ width: 45, textAlign: 'center' }}>#</th>
                   <th style={{ width: 140 }}>Call Outcome</th>
-                  <th style={{ width: 120 }}>{activeTab === 'DUE_SOON' ? 'Status' : 'Priority'}</th>
+                  <th style={{ width: 125 }}>{activeTab === 'DUE_SOON' ? 'Status' : 'Priority'}</th>
                   <th style={{ width: 220 }}>Patient Details</th>
                   <th style={{ width: 160 }}>Phone & Actions</th>
                   <th>Trigger / Reason For Follow-Up</th>
                   <th style={{ width: 180 }}>Last Visit Info</th>
-                  <th style={{ width: 80, textAlign: 'center' }}>Dossier</th>
+                  <th style={{ width: 60, textAlign: 'center' }}>Dossier</th>
                 </tr>
               </thead>
               <tbody>
                 {currentList.length === 0 ? (
                   <tr>
-                    <td colSpan={7} style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-muted)' }}>
+                    <td colSpan={8} style={{ textAlign: 'center', padding: '40px 16px', color: 'var(--text-muted)' }}>
                       No patients match your search or filter parameters.
                     </td>
                   </tr>
                 ) : (
-                  currentList.map((patient) => {
+                  currentList.map((patient, idx) => {
                     const isSelected = selectedMRN === patient.mrn;
                     const disp = callRecords[patient.mrn]?.status || 'PENDING';
-                    const isCompleted = disp !== 'PENDING';
 
                     return (
                       <tr
@@ -785,6 +875,11 @@ export default function App() {
                         onClick={() => setSelectedMRN(patient.mrn)}
                         style={{ cursor: 'pointer' }}
                       >
+                        {/* Queue Index (#) Column */}
+                        <td className="mono" style={{ textAlign: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {idx + 1}
+                        </td>
+
                         {/* Call Outcome Selector */}
                         <td onClick={(e) => e.stopPropagation()}>
                           {['OVERDUE', 'DUE_SOON'].includes(activeTab) ? (
@@ -863,6 +958,12 @@ export default function App() {
                                 Target: {patient.target_date}
                               </span>
                             </div>
+                          )}
+
+                          {activeTab === 'ON_TRACK' && (
+                            <span className="badge badge-success" style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>
+                              <CheckCircle2 size={11} /> On Track
+                            </span>
                           )}
 
                           {activeTab === 'CLINICAL_REVIEW' && (
@@ -954,18 +1055,24 @@ export default function App() {
                                         i === 0
                                           ? activeTab === 'DUE_SOON'
                                             ? 'var(--success-bg)'
+                                            : activeTab === 'ON_TRACK'
+                                            ? '#eff6ff'
                                             : 'var(--urgent-bg)'
                                           : 'var(--bg-subtle)',
                                       color:
                                         i === 0
                                           ? activeTab === 'DUE_SOON'
                                             ? 'var(--success-text)'
+                                            : activeTab === 'ON_TRACK'
+                                            ? '#1d4ed8'
                                             : 'var(--urgent-text)'
                                           : 'var(--text-secondary)',
                                       border:
                                         i === 0
                                           ? activeTab === 'DUE_SOON'
                                             ? '1px solid var(--success-border)'
+                                            : activeTab === 'ON_TRACK'
+                                            ? '1px solid #bfdbfe'
                                             : '1px solid var(--urgent-border)'
                                           : '1px solid var(--border-light)'
                                     }}

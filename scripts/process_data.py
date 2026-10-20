@@ -574,22 +574,26 @@ def run_pipeline(export_dir="export", reference_date_str=DEFAULT_REFERENCE_DATE)
     for k, v in sorted(counts.items()):
         print(f"  Worklist '{k}': {v} patients")
 
-    # Filter distinct lists
+    # Filter distinct mutually exclusive lists (sum = 300)
     overdue_list = [r for r in classified_patients if r["worklist"] == "OVERDUE"]
     due_soon_list = [r for r in classified_patients if r["worklist"] == "DUE_SOON"]
-    review_list = [r for r in classified_patients if r["worklist"] == "CLINICAL_REVIEW" or (r["is_lab_only_diagnosis"] and r["worklist"] in ["OVERDUE", "DUE_SOON"])]
+    on_track_list = [r for r in classified_patients if r["worklist"] == "ON_TRACK"]
+    review_list = [r for r in classified_patients if r["worklist"] == "CLINICAL_REVIEW"]
     excluded_list = [r for r in classified_patients if r["worklist"] == "EXCLUDED"]
 
-    print(f"\nActive Overdue Call List count: {len(overdue_list)}")
-    print(f"Due Soon Reminder List count: {len(due_soon_list)}")
-    print(f"Clinical Review Candidates count: {len(review_list)}")
-    print(f"Excluded (Deceased/Transferred/Non-Diabetic) count: {len(excluded_list)}")
+    total_accounted = len(overdue_list) + len(due_soon_list) + len(on_track_list) + len(review_list) + len(excluded_list)
+    print(f"\nMutually Exclusive Bucket Partition (Total: {total_accounted} / {len(classified_patients)}):")
+    print(f"  1. Overdue Call List: {len(overdue_list)}")
+    print(f"  2. Due Soon Reminder List: {len(due_soon_list)}")
+    print(f"  3. On Track / Up to Date: {len(on_track_list)}")
+    print(f"  4. Clinical Review Queue (Borderline): {len(review_list)}")
+    print(f"  5. Excluded (Deceased/Transferred/Non-Diabetic): {len(excluded_list)}")
+    print(f"  SUM = {len(overdue_list)} + {len(due_soon_list)} + {len(on_track_list)} + {len(review_list)} + {len(excluded_list)} = {total_accounted}")
 
     # High priority vs Medium priority in Overdue
     hp_cnt = sum(1 for r in overdue_list if r["priority"] == "HIGH")
     mp_cnt = sum(1 for r in overdue_list if r["priority"] == "MEDIUM")
-    print(f"  -> High Priority Overdue: {hp_cnt}")
-    print(f"  -> Medium Priority Overdue: {mp_cnt}")
+    print(f"  -> Overdue Breakdown: {hp_cnt} High Priority + {mp_cnt} Medium Priority")
 
     # Generate Frontend JSON
     frontend_data_dir = os.path.join("frontend", "src", "data")
@@ -603,6 +607,7 @@ def run_pipeline(export_dir="export", reference_date_str=DEFAULT_REFERENCE_DATE)
                 "total_patients": len(classified_patients),
                 "overdue_count": len(overdue_list),
                 "due_soon_count": len(due_soon_list),
+                "on_track_count": len(on_track_list),
                 "clinical_review_count": len(review_list),
                 "excluded_count": len(excluded_list)
             },
