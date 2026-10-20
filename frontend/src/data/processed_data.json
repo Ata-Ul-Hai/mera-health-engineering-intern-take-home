@@ -1,6 +1,6 @@
 {
   "reference_date": "2026-10-01",
-  "generated_at": "2026-10-20T05:40:11.809723",
+  "generated_at": "2026-10-20T05:57:42.615497",
   "summary": {
     "total_patients": 300,
     "overdue_count": 58,
@@ -515,7 +515,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin",
         "Notes: Type 2 diabetes. Sugars not under control. BP 144/...",
-        "Lab: HbA1c 7.8% (Diabetic $\\ge$6.5%) [2024-12-06]"
+        "Lab: HbA1c 7.8% (Diabetic \u22656.5%) [2024-12-06]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -771,7 +771,7 @@
         "Diabetology Department visits",
         "Rx: Metformin",
         "Notes: known diabetic, FBS 219 PPBS 291, foot exam NAD, r...",
-        "Lab: FBS 159.0 mg/dL (Diabetic $\\ge$126) [2026-09-03]"
+        "Lab: FBS 159.0 mg/dL (Diabetic \u2265126) [2026-09-03]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -826,7 +826,7 @@
         "Diabetology Department visits",
         "Rx: Dapagliflozin, Gliclazide MR",
         "Notes: T2DM, sugars not under control, irregular with die...",
-        "Lab: FBS 131.0 mg/dL (Diabetic $\\ge$126) [2025-09-03]"
+        "Lab: FBS 131.0 mg/dL (Diabetic \u2265126) [2025-09-03]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -1208,7 +1208,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride, Tab. Glimepiride",
         "Notes: k/c/o DM. FBS 164, PPBS 236. Foot exam NAD. Refer ...",
-        "Lab: FBS 162.0 mg/dL (Diabetic $\\ge$126) [2026-01-07]"
+        "Lab: FBS 162.0 mg/dL (Diabetic \u2265126) [2026-01-07]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -1265,7 +1265,7 @@
       "clinical_evidence": [
         "Rx: Metformin",
         "Notes: Type 2 diabetes. Rpt FBS/PPBS next visit...",
-        "Lab: Glycated Hb 56.0 mmol/mol (Diabetic $\\ge$48) [2024-09-29]"
+        "Lab: Glycated Hb 56.0 mmol/mol (Diabetic \u226548) [2024-09-29]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -1321,7 +1321,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Glimepiride, Tab. Metformin SR",
         "Notes: Known diabetic (13 yrs). HbA1c 6.8. Home GRBS 119-...",
-        "Lab: FBS 132.0 mg/dL (Diabetic $\\ge$126) [2024-10-14]"
+        "Lab: FBS 132.0 mg/dL (Diabetic \u2265126) [2024-10-14]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -1688,7 +1688,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 6.6% (Diabetic $\\ge$6.5%) [2025-04-11]"
+        "Lab Finding: HbA1c 6.6% (Diabetic \u22656.5%) [2025-04-11]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -1775,7 +1775,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 8.2% (Diabetic $\\ge$6.5%) [2025-03-11]"
+        "Lab Finding: HbA1c 8.2% (Diabetic \u22656.5%) [2025-03-11]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -1824,7 +1824,7 @@
         "Diabetology Department visits",
         "Rx: T. Metformin",
         "Notes: type 2 diabetes; home GRBS 153-194; no fresh compl...",
-        "Lab: PPBS 243.0 mg/dL (Diabetic $\\ge$200) [2025-10-30]"
+        "Lab: PPBS 243.0 mg/dL (Diabetic \u2265200) [2025-10-30]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -2122,7 +2122,7 @@
       "is_lab_only_diagnosis": false,
       "clinical_evidence": [
         "Rx: T. Glimepiride",
-        "Lab: FBS 144.0 mg/dL (Diabetic $\\ge$126) [2025-11-13]"
+        "Lab: FBS 144.0 mg/dL (Diabetic \u2265126) [2025-11-13]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -2309,7 +2309,7 @@
       "is_lab_only_diagnosis": false,
       "clinical_evidence": [
         "Rx: T. Dapagliflozin, T. Gliclazide MR",
-        "Lab: Glycated Hb 68.0 mmol/mol (Diabetic $\\ge$48) [2025-08-20]"
+        "Lab: Glycated Hb 68.0 mmol/mol (Diabetic \u226548) [2025-08-20]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -2456,7 +2456,7 @@
         "Diabetology Department visits",
         "Rx: Inj. Human Mixtard 30/70",
         "Notes: Type 2 diabetes - 8 yrs. r/v 3/12....",
-        "Lab: HbA1c 9.8% (Diabetic $\\ge$6.5%) [2026-05-26]"
+        "Lab: HbA1c 9.8% (Diabetic \u22656.5%) [2026-05-26]"
       ],
       "followup_status": "DUE_SOON",
       "priority": "DUE_SOON",
@@ -2511,7 +2511,7 @@
       "clinical_evidence": [
         "Rx: Insulin Degludec, Insulin Lispro",
         "Notes: Juvenile diabetes on insulin, Parents giving injec...",
-        "Lab: HbA1c 8.4% (Diabetic $\\ge$6.5%) [2024-09-24]"
+        "Lab: HbA1c 8.4% (Diabetic \u22656.5%) [2024-09-24]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -2570,7 +2570,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride + Metformin",
         "Notes: T2DM since 2025, HbA1c 7.7, FBS 157, cont same Rx,...",
-        "Lab: PPBS 244.0 mg/dL (Diabetic $\\ge$200) [2026-08-10]"
+        "Lab: PPBS 244.0 mg/dL (Diabetic \u2265200) [2026-08-10]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -2707,7 +2707,7 @@
       "is_lab_only_diagnosis": false,
       "clinical_evidence": [
         "Rx: Glimepiride, Metformin SR",
-        "Lab: HbA1c 9.4% (Diabetic $\\ge$6.5%) [2026-08-12]"
+        "Lab: HbA1c 9.4% (Diabetic \u22656.5%) [2026-08-12]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -2757,7 +2757,7 @@
       "is_lab_only_diagnosis": false,
       "clinical_evidence": [
         "Rx: T. Metformin",
-        "Lab: Fasting Glucose 9.1 mmol/L (Diabetic $\\ge$7.0) [2026-09-01]"
+        "Lab: Fasting Glucose 9.1 mmol/L (Diabetic \u22657.0) [2026-09-01]"
       ],
       "followup_status": "DUE_SOON",
       "priority": "DUE_SOON",
@@ -3008,7 +3008,7 @@
         "Diabetology Department visits",
         "Rx: T. Glimepiride + Metformin",
         "Notes: type 2 diabetes x 6 yrs; sugars not under control;...",
-        "Lab: HbA1c 9.5% (Diabetic $\\ge$6.5%) [2025-01-30]"
+        "Lab: HbA1c 9.5% (Diabetic \u22656.5%) [2025-01-30]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -3137,7 +3137,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride, Insulin Glargine, Metformin",
         "Notes: Known diabetic (4 yrs). F 214 / PP 299. Pedal puls...",
-        "Lab: PPBS 312.0 mg/dL (Diabetic $\\ge$200) [2025-11-26]"
+        "Lab: PPBS 312.0 mg/dL (Diabetic \u2265200) [2025-11-26]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -3207,7 +3207,7 @@
       "clinical_evidence": [
         "Rx: Metformin, Sitagliptin",
         "Notes: Type 2 diabetes x 12 yrs. Sugars running high. Ped...",
-        "Lab: Glycated Hb 72.0 mmol/mol (Diabetic $\\ge$48) [2024-11-21]"
+        "Lab: Glycated Hb 72.0 mmol/mol (Diabetic \u226548) [2024-11-21]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -3358,7 +3358,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride",
         "Notes: T2DM. FBS 112, PPBS 195. Cont same meds. r/v 3/12...",
-        "Lab: Glycated Hb 53.0 mmol/mol (Diabetic $\\ge$48) [2024-10-20]"
+        "Lab: Glycated Hb 53.0 mmol/mol (Diabetic \u226548) [2024-10-20]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -3776,7 +3776,7 @@
       "clinical_evidence": [
         "Rx: Human Mixtard 30/70",
         "Notes: k/c/o DM since 2012. Home GRBS 141-195. Rpt FBS/PP...",
-        "Lab: FBS 156.0 mg/dL (Diabetic $\\ge$126) [2026-09-17]"
+        "Lab: FBS 156.0 mg/dL (Diabetic \u2265126) [2026-09-17]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -3873,7 +3873,7 @@
         "Diabetology Department visits",
         "Rx: T. Metformin, Tab. Metformin",
         "Notes: Type II diabetes (3 yrs). HbA1c 11.2. FBS 248, PPB...",
-        "Lab: HbA1c 10.9% (Diabetic $\\ge$6.5%) [2026-09-02]"
+        "Lab: HbA1c 10.9% (Diabetic \u22656.5%) [2026-09-02]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -3966,7 +3966,7 @@
       "clinical_evidence": [
         "Rx: T. Glimepiride, T. Metformin SR",
         "Notes: T2DM; FBS 221; BP 143/86; review 1 month...",
-        "Lab: FBS 153.0 mg/dL (Diabetic $\\ge$126) [2026-09-16]"
+        "Lab: FBS 153.0 mg/dL (Diabetic \u2265126) [2026-09-16]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -4314,7 +4314,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Metformin",
-        "Lab: HbA1c 7.6% (Diabetic $\\ge$6.5%) [2026-03-22]"
+        "Lab: HbA1c 7.6% (Diabetic \u22656.5%) [2026-03-22]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -4451,7 +4451,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 8.0% (Diabetic $\\ge$6.5%) [2025-07-09], HbA1c 7.9% (Diabetic $\\ge$6.5%) [2025-12-01]"
+        "Lab Finding: HbA1c 8.0% (Diabetic \u22656.5%) [2025-07-09], HbA1c 7.9% (Diabetic \u22656.5%) [2025-12-01]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -4539,7 +4539,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride",
         "Notes: k/c/o DM. c/o tingling both feet. Add 2nd OHA...",
-        "Lab: HbA1c 8.5% (Diabetic $\\ge$6.5%) [2025-05-14]"
+        "Lab: HbA1c 8.5% (Diabetic \u22656.5%) [2025-05-14]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -4798,7 +4798,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Vildagliptin",
         "Notes: Known diabetic - 9 yrs. FBS 148, PPBS 198. Urine m...",
-        "Lab: FBS 148.0 mg/dL (Diabetic $\\ge$126) [2025-07-23]"
+        "Lab: FBS 148.0 mg/dL (Diabetic \u2265126) [2025-07-23]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -4897,7 +4897,7 @@
         "Diabetology Department visits",
         "Rx: T. Glimepiride + Metformin",
         "Notes: type 2 diabetes, FBS 177, cont same meds, review 1...",
-        "Lab: HbA1c 9.2% (Diabetic $\\ge$6.5%) [2026-08-20]"
+        "Lab: HbA1c 9.2% (Diabetic \u22656.5%) [2026-08-20]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -5067,7 +5067,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride, Metformin SR, Tab. Glimepiride",
         "Notes: Type 2 diabetes. F 173 / PP 282. Adv diet + daily ...",
-        "Lab: PPBS 282.0 mg/dL (Diabetic $\\ge$200) [2025-08-08]"
+        "Lab: PPBS 282.0 mg/dL (Diabetic \u2265200) [2025-08-08]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -5132,7 +5132,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Gliclazide MR",
         "Notes: k/c/o DM. FBS 110 PPBS 172. Review 3 months with H...",
-        "Lab: HbA1c 6.7% (Diabetic $\\ge$6.5%) [2025-01-29]"
+        "Lab: HbA1c 6.7% (Diabetic \u22656.5%) [2025-01-29]"
       ],
       "followup_status": "DUE_SOON",
       "priority": "DUE_SOON",
@@ -5190,7 +5190,7 @@
         "Diabetology Department visits",
         "Rx: Inj. Insulin Glargine, Tab. Glimepiride, Tab. Metformin",
         "Notes: k/c/o DM. Sugars running high. Incr OHA dose....",
-        "Lab: HbA1c 9.4% (Diabetic $\\ge$6.5%) [2026-09-03]"
+        "Lab: HbA1c 9.4% (Diabetic \u22656.5%) [2026-09-03]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -5417,7 +5417,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 6.8% (Diabetic $\\ge$6.5%) [2025-12-11], HbA1c 6.8% (Diabetic $\\ge$6.5%) [2025-12-11]"
+        "Lab Finding: HbA1c 6.8% (Diabetic \u22656.5%) [2025-12-11], HbA1c 6.8% (Diabetic \u22656.5%) [2025-12-11]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -5466,7 +5466,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Dapagliflozin, Tab. Metformin",
         "Notes: T2DM (14 yrs). HbA1c 7.4. F 135 / PP 218. c/o tire...",
-        "Lab: Glycated Hb 56.0 mmol/mol (Diabetic $\\ge$48) [2025-11-20]"
+        "Lab: Glycated Hb 56.0 mmol/mol (Diabetic \u226548) [2025-11-20]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -5650,7 +5650,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin",
         "Notes: type 2 diabetes since 2012; FBS 219 PPBS 295; no f...",
-        "Lab: HbA1c 10.8% (Diabetic $\\ge$6.5%) [2025-07-17]"
+        "Lab: HbA1c 10.8% (Diabetic \u22656.5%) [2025-07-17]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -5710,7 +5710,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride, Metformin SR",
         "Notes: T2DM. c/o tiredness. Cont same Rx...",
-        "Lab: HbA1c 7.3% (Diabetic $\\ge$6.5%) [2026-01-31]"
+        "Lab: HbA1c 7.3% (Diabetic \u22656.5%) [2026-01-31]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -5816,7 +5816,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride, Metformin SR",
         "Notes: T2DM since 2021, sugars running high, c/o tirednes...",
-        "Lab: FBS 158.0 mg/dL (Diabetic $\\ge$126) [2025-10-26]"
+        "Lab: FBS 158.0 mg/dL (Diabetic \u2265126) [2025-10-26]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -6081,7 +6081,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin",
         "Notes: Diabetes mellitus (9 yrs). Sugars not under contro...",
-        "Lab: A1C 8.3% (Diabetic $\\ge$6.5%) [2024-03-29]"
+        "Lab: A1C 8.3% (Diabetic \u22656.5%) [2024-03-29]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -6285,7 +6285,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 65.0 mmol/mol (Diabetic $\\ge$48) [2025-11-21]"
+        "Lab Finding: HbA1c 65.0 mmol/mol (Diabetic \u226548) [2025-11-21]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -6809,7 +6809,7 @@
         "Diabetology Department visits",
         "Rx: Metformin, Tab. Metformin",
         "Notes: Diabetic. FBS 146. c/o burning soles. Insulin disc...",
-        "Lab: FBS 141.0 mg/dL (Diabetic $\\ge$126) [2025-05-17]"
+        "Lab: FBS 141.0 mg/dL (Diabetic \u2265126) [2025-05-17]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -6864,7 +6864,7 @@
         "Diabetology Department visits",
         "Rx: Inj. Insulin Glargine, Tab. Glimepiride, Tab. Metformin",
         "Notes: Known diabetic x 5 yrs. No fresh complaints. Add 2...",
-        "Lab: PPBS 223.0 mg/dL (Diabetic $\\ge$200) [2024-12-07]"
+        "Lab: PPBS 223.0 mg/dL (Diabetic \u2265200) [2024-12-07]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -6921,7 +6921,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Metformin",
-        "Lab: HbA1c 6.5% (Diabetic $\\ge$6.5%) [2025-06-29]"
+        "Lab: HbA1c 6.5% (Diabetic \u22656.5%) [2025-06-29]"
       ],
       "followup_status": "DUE_SOON",
       "priority": "DUE_SOON",
@@ -6976,7 +6976,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin, Tab. Sitagliptin",
         "Notes: Known diabetic. Sugars not under control. Foot exa...",
-        "Lab: PPBS 296.0 mg/dL (Diabetic $\\ge$200) [2024-11-12]"
+        "Lab: PPBS 296.0 mg/dL (Diabetic \u2265200) [2024-11-12]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -7036,7 +7036,7 @@
       "clinical_evidence": [
         "Rx: Tab. Metformin",
         "Notes: GDM on metformin. Sugars controlled. Cont, growth ...",
-        "Lab: HbA1c 6.6% (Diabetic $\\ge$6.5%) [2025-09-17]"
+        "Lab: HbA1c 6.6% (Diabetic \u22656.5%) [2025-09-17]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -7429,7 +7429,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Dapagliflozin, Metformin, T. Dapagliflozin",
-        "Lab: HbA1c 10.3% (Diabetic $\\ge$6.5%) [2025-12-31]"
+        "Lab: HbA1c 10.3% (Diabetic \u22656.5%) [2025-12-31]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -7526,7 +7526,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Glimepiride, Sitagliptin, Tab. Glimepiride",
-        "Lab: HbA1c 10.3% (Diabetic $\\ge$6.5%) [2026-07-23]"
+        "Lab: HbA1c 10.3% (Diabetic \u22656.5%) [2026-07-23]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -7589,7 +7589,7 @@
       "clinical_evidence": [
         "Rx: Insulin Degludec, Insulin Lispro",
         "Notes: T1DM, on basal bolus, HbA1c 10.1, Wt 28 kg, No DKA...",
-        "Lab: HbA1c 10.1% (Diabetic $\\ge$6.5%) [2025-12-09]"
+        "Lab: HbA1c 10.1% (Diabetic \u22656.5%) [2025-12-09]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -7650,7 +7650,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin",
         "Notes: diabetic since 2011; home GRBS 214-276; no hypo ep...",
-        "Lab: Fasting Glucose 13.2 mmol/L (Diabetic $\\ge$7.0) [2024-08-16]"
+        "Lab: Fasting Glucose 13.2 mmol/L (Diabetic \u22657.0) [2024-08-16]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -7746,7 +7746,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin, T. Sitagliptin",
         "Notes: T2DM x 9 yrs; HbA1c 7.0; FBS 134; review after 3 m...",
-        "Lab: HbA1c 7.0% (Diabetic $\\ge$6.5%) [2025-05-30]"
+        "Lab: HbA1c 7.0% (Diabetic \u22656.5%) [2025-05-30]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -7989,7 +7989,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin, Tab. Sitagliptin",
         "Notes: k/c/o DM. HbA1c 8.6. Sugars running high. Review a...",
-        "Lab: HbA1c 8.6% (Diabetic $\\ge$6.5%) [2024-09-02]"
+        "Lab: HbA1c 8.6% (Diabetic \u22656.5%) [2024-09-02]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -8081,7 +8081,7 @@
         "Diabetology Department visits",
         "Rx: T. Metformin, T. Sitagliptin, Tab. Metformin",
         "Notes: type 2 diabetes - 3 yrs; sugars under control; no ...",
-        "Lab: FBS 126.0 mg/dL (Diabetic $\\ge$126) [2025-03-04]"
+        "Lab: FBS 126.0 mg/dL (Diabetic \u2265126) [2025-03-04]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -8141,7 +8141,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin, T. Sitagliptin",
         "Notes: type 2 diabetes x 2 yrs; home GRBS 157-218; cont s...",
-        "Lab: PPBS 252.0 mg/dL (Diabetic $\\ge$200) [2025-07-06]"
+        "Lab: PPBS 252.0 mg/dL (Diabetic \u2265200) [2025-07-06]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -8393,7 +8393,7 @@
         "Diabetology Department visits",
         "Rx: Metformin",
         "Notes: diabetes mellitus - newly diagnosed, FBS 163, c/o ...",
-        "Lab: HbA1c 8.1% (Diabetic $\\ge$6.5%) [2024-10-31]"
+        "Lab: HbA1c 8.1% (Diabetic \u22656.5%) [2024-10-31]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -8649,7 +8649,7 @@
       "clinical_evidence": [
         "Rx: Dapagliflozin, Metformin",
         "Notes: T2DM x 1 yrs. Home GRBS 103-138. Wt 91 kg. Review ...",
-        "Lab: HbA1c 6.6% (Diabetic $\\ge$6.5%) [2026-06-17]"
+        "Lab: HbA1c 6.6% (Diabetic \u22656.5%) [2026-06-17]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9009,7 +9009,7 @@
         "Diabetology Department visits",
         "Rx: Metformin",
         "Notes: k/c/o T2DM on OHA. b/l knee pain x 1 month. Crepit...",
-        "Lab: FBS 128.0 mg/dL (Diabetic $\\ge$126) [2025-07-29]"
+        "Lab: FBS 128.0 mg/dL (Diabetic \u2265126) [2025-07-29]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9139,7 +9139,7 @@
       "clinical_evidence": [
         "Rx: Metformin",
         "Notes: Diabetic since 2023. HbA1c 9.5. FBS 191, PPBS 285....",
-        "Lab: FBS 186.0 mg/dL (Diabetic $\\ge$126) [2026-01-30]"
+        "Lab: FBS 186.0 mg/dL (Diabetic \u2265126) [2026-01-30]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9197,7 +9197,7 @@
       "clinical_evidence": [
         "Rx: Metformin",
         "Notes: Diabetic - 2 yrs. HbA1c 7.2. FBS 123 PPBS 227. Rev...",
-        "Lab: PPBS 237.0 mg/dL (Diabetic $\\ge$200) [2026-01-26]"
+        "Lab: PPBS 237.0 mg/dL (Diabetic \u2265200) [2026-01-26]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -9292,7 +9292,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride, Sitagliptin",
         "Notes: k/c/o DM - 13 yrs. Sugars not under control. Wt 58...",
-        "Lab: PPBS 265.0 mg/dL (Diabetic $\\ge$200) [2026-03-09]"
+        "Lab: PPBS 265.0 mg/dL (Diabetic \u2265200) [2026-03-09]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9399,7 +9399,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin",
         "Notes: NIDDM (14 yrs). Sugars not under control. Fundus c...",
-        "Lab: FBS 161.0 mg/dL (Diabetic $\\ge$126) [2026-08-02]"
+        "Lab: FBS 161.0 mg/dL (Diabetic \u2265126) [2026-08-02]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9589,7 +9589,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Tab. Vildagliptin",
-        "Lab: HbA1c 6.5% (Diabetic $\\ge$6.5%) [2026-01-02]"
+        "Lab: HbA1c 6.5% (Diabetic \u22656.5%) [2026-01-02]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -9640,7 +9640,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Dapagliflozin, Metformin, T. Dapagliflozin",
-        "Lab: HbA1c 8.5% (Diabetic $\\ge$6.5%) [2026-08-23]"
+        "Lab: HbA1c 8.5% (Diabetic \u22656.5%) [2026-08-23]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -9745,7 +9745,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin",
         "Notes: known diabetic (6 yrs); HbA1c 10.0; home GRBS 191-...",
-        "Lab: HbA1c 10.0% (Diabetic $\\ge$6.5%) [2026-04-22]"
+        "Lab: HbA1c 10.0% (Diabetic \u22656.5%) [2026-04-22]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -9886,7 +9886,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Glimepiride, Insulin Glargine, Metformin",
-        "Lab: PPBS 262.0 mg/dL (Diabetic $\\ge$200) [2025-03-02]"
+        "Lab: PPBS 262.0 mg/dL (Diabetic \u2265200) [2025-03-02]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -9992,7 +9992,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Glimepiride + Metformin",
         "Notes: Type 2 diabetes. HbA1c 8.1. FBS 149, PPBS 247. Rev...",
-        "Lab: HbA1c 8.1% (Diabetic $\\ge$6.5%) [2025-10-16]"
+        "Lab: HbA1c 8.1% (Diabetic \u22656.5%) [2025-10-16]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10125,7 +10125,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 6.5% (Diabetic $\\ge$6.5%) [2025-03-07]"
+        "Lab Finding: HbA1c 6.5% (Diabetic \u22656.5%) [2025-03-07]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10360,7 +10360,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Dapagliflozin, Tab. Metformin",
         "Notes: Diabetes mellitus. FBS 163 PPBS 251. Refer ophthal...",
-        "Lab: HbA1c 8.5% (Diabetic $\\ge$6.5%) [2026-09-02]"
+        "Lab: HbA1c 8.5% (Diabetic \u22656.5%) [2026-09-02]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -10454,7 +10454,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: Glycated Hb 59.0 mmol/mol (Diabetic $\\ge$48) [2025-04-13], Fasting Glucose 9.8 mmol/L (Diabetic $\\ge$7.0) [2025-07-29], Glycated Hb 65.0 mmol/mol (Diabetic $\\ge$48) [2025-07-30]"
+        "Lab Finding: Glycated Hb 59.0 mmol/mol (Diabetic \u226548) [2025-04-13], Fasting Glucose 9.8 mmol/L (Diabetic \u22657.0) [2025-07-29], Glycated Hb 65.0 mmol/mol (Diabetic \u226548) [2025-07-30]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10503,7 +10503,7 @@
         "Diabetology Department visits",
         "Rx: T. Dapagliflozin, T. Metformin, Tab. Dapagliflozin",
         "Notes: T2DM since 2018. HbA1c 7.1. FBS 138, PPBS 185. c/o...",
-        "Lab: FBS 138.0 mg/dL (Diabetic $\\ge$126) [2026-07-23]"
+        "Lab: FBS 138.0 mg/dL (Diabetic \u2265126) [2026-07-23]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -10561,7 +10561,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Dapagliflozin, Tab. Metformin",
         "Notes: Type 2 diabetes. F 126 / PP 199. Cont same meds....",
-        "Lab: FBS 126.0 mg/dL (Diabetic $\\ge$126) [2026-04-28]"
+        "Lab: FBS 126.0 mg/dL (Diabetic \u2265126) [2026-04-28]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10664,7 +10664,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 6.5% (Diabetic $\\ge$6.5%) [2025-04-27]"
+        "Lab Finding: HbA1c 6.5% (Diabetic \u22656.5%) [2025-04-27]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10709,7 +10709,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 65.0 mmol/mol (Diabetic $\\ge$48) [2025-11-17]"
+        "Lab Finding: HbA1c 65.0 mmol/mol (Diabetic \u226548) [2025-11-17]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -10928,7 +10928,7 @@
         "Diabetology Department visits",
         "Rx: Metformin",
         "Notes: known diabetic, HbA1c 8.5, home GRBS 158-202, wt 6...",
-        "Lab: FBS 172.0 mg/dL (Diabetic $\\ge$126) [2026-04-16]"
+        "Lab: FBS 172.0 mg/dL (Diabetic \u2265126) [2026-04-16]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -11071,7 +11071,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride, Inj. Insulin Glargine, Insulin Glargine",
         "Notes: known diabetic, F 147 / PP 183, compliant with med...",
-        "Lab: Glycated Hb 50.0 mmol/mol (Diabetic $\\ge$48) [2026-07-30]"
+        "Lab: Glycated Hb 50.0 mmol/mol (Diabetic \u226548) [2026-07-30]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -11138,7 +11138,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 8.2% (Diabetic $\\ge$6.5%) [2025-07-10], HbA1c 7.8% (Diabetic $\\ge$6.5%) [2025-12-25]"
+        "Lab Finding: HbA1c 8.2% (Diabetic \u22656.5%) [2025-07-10], HbA1c 7.8% (Diabetic \u22656.5%) [2025-12-25]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11186,7 +11186,7 @@
       "is_lab_only_diagnosis": false,
       "clinical_evidence": [
         "Rx: Insulin Aspart, Insulin Glargine",
-        "Lab: HbA1c 10.2% (Diabetic $\\ge$6.5%) [2025-07-13]"
+        "Lab: HbA1c 10.2% (Diabetic \u22656.5%) [2025-07-13]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11281,7 +11281,7 @@
       "diabetes_category": "CONFIRMED_DIABETIC",
       "is_lab_only_diagnosis": true,
       "clinical_evidence": [
-        "Lab Finding: HbA1c 8.1% (Diabetic $\\ge$6.5%) [2025-07-18]"
+        "Lab Finding: HbA1c 8.1% (Diabetic \u22656.5%) [2025-07-18]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -11367,7 +11367,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Vildagliptin",
         "Notes: Known diabetic since 2011. Rpt FBS/PPBS next visit...",
-        "Lab: FBS 138.0 mg/dL (Diabetic $\\ge$126) [2026-07-31]"
+        "Lab: FBS 138.0 mg/dL (Diabetic \u2265126) [2026-07-31]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11419,7 +11419,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride, Metformin SR",
         "Notes: Diabetes mellitus since 2016. Urine microalbumin a...",
-        "Lab: Glycated Hb 51.0 mmol/mol (Diabetic $\\ge$48) [2026-08-18]"
+        "Lab: Glycated Hb 51.0 mmol/mol (Diabetic \u226548) [2026-08-18]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11508,7 +11508,7 @@
       "clinical_evidence": [
         "Rx: T. Metformin",
         "Notes: diabetes mellitus - newly diagnosed; HbA1c 10.2; F...",
-        "Lab: FBS 215.0 mg/dL (Diabetic $\\ge$126) [2025-08-19]"
+        "Lab: FBS 215.0 mg/dL (Diabetic \u2265126) [2025-08-19]"
       ],
       "followup_status": "OVERDUE",
       "priority": "HIGH",
@@ -11641,7 +11641,7 @@
       "clinical_evidence": [
         "Rx: Glimepiride, Insulin Glargine, Metformin",
         "Notes: T2DM. FBS 133. Cont same meds. Review 3 months wit...",
-        "Lab: PPBS 207.0 mg/dL (Diabetic $\\ge$200) [2026-08-15]"
+        "Lab: PPBS 207.0 mg/dL (Diabetic \u2265200) [2026-08-15]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11820,7 +11820,7 @@
       "clinical_evidence": [
         "Rx: T. Vildagliptin",
         "Notes: diabetic since 2017; HbA1c 10.2; walking 30 min da...",
-        "Lab: PPBS 349.0 mg/dL (Diabetic $\\ge$200) [2026-08-18]"
+        "Lab: PPBS 349.0 mg/dL (Diabetic \u2265200) [2026-08-18]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11874,7 +11874,7 @@
       "clinical_evidence": [
         "Rx: T. Glimepiride, T. Metformin SR",
         "Notes: diabetic x 10 yrs; F 198 / PP 308; urine microalbu...",
-        "Lab: Glycated Hb 82.0 mmol/mol (Diabetic $\\ge$48) [2025-10-11]"
+        "Lab: Glycated Hb 82.0 mmol/mol (Diabetic \u226548) [2025-10-11]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -11975,7 +11975,7 @@
         "Diabetology Department visits",
         "Rx: Metformin, Sitagliptin, Tab. Metformin",
         "Notes: Type 2 diabetes - 15 yrs. FBS 130, PPBS 168. Rpt F...",
-        "Lab: FBS 130.0 mg/dL (Diabetic $\\ge$126) [2026-07-15]"
+        "Lab: FBS 130.0 mg/dL (Diabetic \u2265126) [2026-07-15]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -12031,7 +12031,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride",
         "Notes: type II diabetes, HbA1c 7.6, sugars not under cont...",
-        "Lab: PPBS 227.0 mg/dL (Diabetic $\\ge$200) [2026-09-04]"
+        "Lab: PPBS 227.0 mg/dL (Diabetic \u2265200) [2026-09-04]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -12084,7 +12084,7 @@
         "Diabetology Department visits",
         "Rx: T. Vildagliptin",
         "Notes: diabetes mellitus since 2020; FBS 139 PPBS 203; c/...",
-        "Lab: HbA1c 8.4% (Diabetic $\\ge$6.5%) [2026-08-09]"
+        "Lab: HbA1c 8.4% (Diabetic \u22656.5%) [2026-08-09]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -12216,7 +12216,7 @@
         "Diabetology Department visits",
         "Rx: Glimepiride, Sitagliptin",
         "Notes: k/c/o DM (12 yrs). Sugars running high. Rpt FBS/PP...",
-        "Lab: HbA1c 8.7% (Diabetic $\\ge$6.5%) [2026-08-25]"
+        "Lab: HbA1c 8.7% (Diabetic \u22656.5%) [2026-08-25]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -12362,7 +12362,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin",
         "Notes: Type 2 diabetes since 2019. HbA1c 7.0. Home GRBS 1...",
-        "Lab: HbA1c 7.0% (Diabetic $\\ge$6.5%) [2026-04-24]"
+        "Lab: HbA1c 7.0% (Diabetic \u22656.5%) [2026-04-24]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",
@@ -12567,7 +12567,7 @@
         "Diabetology Department visits",
         "Rx: Tab. Metformin",
         "Notes: New case of diabetes mellitus. FBS 205 PPBS 291. B...",
-        "Lab: Glycated Hb 83.0 mmol/mol (Diabetic $\\ge$48) [2025-12-10]"
+        "Lab: Glycated Hb 83.0 mmol/mol (Diabetic \u226548) [2025-12-10]"
       ],
       "followup_status": "OVERDUE",
       "priority": "MEDIUM",
@@ -12736,7 +12736,7 @@
       "clinical_evidence": [
         "Diabetology Department visits",
         "Rx: Tab. Dapagliflozin, Tab. Metformin",
-        "Lab: FBS 130.0 mg/dL (Diabetic $\\ge$126) [2026-09-03]"
+        "Lab: FBS 130.0 mg/dL (Diabetic \u2265126) [2026-09-03]"
       ],
       "followup_status": "NOT_DUE",
       "priority": "ROUTINE",

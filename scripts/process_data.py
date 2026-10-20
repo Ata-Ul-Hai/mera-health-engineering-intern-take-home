@@ -147,14 +147,14 @@ def evaluate_lab_test(test_name, val_str, unit, ref_range):
     if any(k in name_clean for k in ["hba1c", "a1c", "glycated"]):
         if "%" in unit_clean or val < 20: # Percentage scale
             if val >= 6.5:
-                return True, False, False, f"{test_name} {val}% (Diabetic $\\ge$6.5%)"
+                return True, False, False, f"{test_name} {val}% (Diabetic ≥6.5%)"
             elif 5.7 <= val < 6.5:
                 return False, True, False, f"{test_name} {val}% (Borderline 5.7-6.4%)"
             else:
                 return False, False, True, f"{test_name} {val}% (Normal <5.7%)"
         else: # mmol/mol scale (IFCC)
             if val >= 48:
-                return True, False, False, f"{test_name} {val} mmol/mol (Diabetic $\\ge$48)"
+                return True, False, False, f"{test_name} {val} mmol/mol (Diabetic ≥48)"
             elif 39 <= val < 48:
                 return False, True, False, f"{test_name} {val} mmol/mol (Borderline 39-47)"
             else:
@@ -164,14 +164,14 @@ def evaluate_lab_test(test_name, val_str, unit, ref_range):
     if any(k in name_clean for k in ["fbs", "fasting"]):
         if "mmol" in unit_clean or val < 25:
             if val >= 7.0:
-                return True, False, False, f"{test_name} {val} mmol/L (Diabetic $\\ge$7.0)"
+                return True, False, False, f"{test_name} {val} mmol/L (Diabetic ≥7.0)"
             elif 5.6 <= val < 7.0:
                 return False, True, False, f"{test_name} {val} mmol/L (Impaired 5.6-6.9)"
             else:
                 return False, False, True, f"{test_name} {val} mmol/L (Normal)"
         else:
             if val >= 126:
-                return True, False, False, f"{test_name} {val} mg/dL (Diabetic $\\ge$126)"
+                return True, False, False, f"{test_name} {val} mg/dL (Diabetic ≥126)"
             elif 100 <= val < 126:
                 return False, True, False, f"{test_name} {val} mg/dL (Impaired 100-125)"
             else:
@@ -180,7 +180,7 @@ def evaluate_lab_test(test_name, val_str, unit, ref_range):
     # Post Prandial Blood Sugar
     if any(k in name_clean for k in ["ppbs", "post prandial"]):
         if val >= 200:
-            return True, False, False, f"{test_name} {val} mg/dL (Diabetic $\\ge$200)"
+            return True, False, False, f"{test_name} {val} mg/dL (Diabetic ≥200)"
         elif 140 <= val < 200:
             return False, True, False, f"{test_name} {val} mg/dL (Impaired 140-199)"
         else:
