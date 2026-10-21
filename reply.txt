@@ -1,17 +1,15 @@
 Hi Meenakshi,
 
-We have organized your records into an easy-to-use follow-up portal and three dedicated spreadsheets:
+We have organized your records into an operational follow-up dashboard and three clean CSV spreadsheets:
 
-1. Overdue Call List (45 patients): Confirmed diabetic patients whose follow-up is overdue. We marked 24 as High Priority (taking insulin or severe blood sugars) and placed them at the top of your calling queue.
-2. Due Soon Reminder List (5 patients): Patients with appointments due in the next 14 days, helping your team send preventive reminders before appointments lapse.
-3. Flagged for Verification (23 patients): A separate review list for duplicate profiles (e.g., Joseph D'Souza), unconfirmed lab-only findings, and borderline cases so staff do not make uninformed calls.
+1. Overdue Call List (43 patients): Confirmed diabetic patients whose follow-up is overdue. We marked 24 as High Priority (taking insulin or severe blood sugars) and placed them at the top of your calling queue.
+2. Due Soon Reminder List (5 patients): Upcoming appointments within 14 days, helping your team send preventive reminders before appointments lapse.
+3. Flagged for Verification (24 patients): A separate review list for duplicate profiles, unconfirmed lab findings, and borderline cases so staff do not make uninformed calls.
 
-Key safeguards in place:
-• Do Not Call List: 3 deceased patients and 3 who transferred care were excluded to prevent distressing calls.
-• Diabetes Baseline: Unrelated visits (like Dental or ENT) do not reset diabetic follow-up.
-• Front Desk Flags: Shared family phone numbers and missing contacts are clearly badged.
-
-Your team can launch the portal anytime by running ./run.sh, or open the CSV files directly in Excel.
+Website & Tools:
+• Launch the portal anytime with a single command: ./run.sh (opens locally on port 3000). The dashboard features priority calling queues, real-time call logging (Booked, Voicemail, Callback, Inactive), and instant clinical dossiers with visit histories.
+• CSV exports are located in export/: overdue_diabetic_patients.csv, due_soon_diabetic_patients.csv, and flagged_verification_patients.csv for direct Excel access.
+• Guardrails: Deceased and transferred patients are safely excluded.
 
 Warm regards,  
 mera.health Team

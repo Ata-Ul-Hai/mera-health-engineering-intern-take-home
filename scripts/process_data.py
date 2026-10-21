@@ -32,6 +32,12 @@ NEGATION_PATTERNS = [
     r"\b(?:denies|denied)\s+diabetes\b",
     r"\bno\s+h/o\s+diabetes\b",
     r"\bnon-diabetic\b",
+    r"\bpre[-\s]?diabetic\b",                                          # Bug 1: "pre-diabetic" has hyphen as word boundary, matches \bdiabetic\b
+    r"\bborderline\s+diabet\w*",                                       # Bug 1: "borderline diabetic" is prediabetes, not confirmed DM
+    r"\bprediabetes\b",
+    r"\bpre-diabetes\b",
+    r"\bfamily\s+(?:history|h/o)?\s*(?:of\s+)?diabetes\b",           # Bug 2: "family history of diabetes" is NOT patient's own diagnosis
+    r"\bf/h\s+.*?diabet",                                             # Bug 2: f/h shorthand for family history
     r"\b(?:father|mother|brother|sister|parents?|family|f/h:?\s*(?:father|mother)?)\s+(?:is\s+)?diabetic\b",
     r"\burine\s+sugar\s+nil\b",
     r"\bimpaired\s+fasting\s+glucose\b",

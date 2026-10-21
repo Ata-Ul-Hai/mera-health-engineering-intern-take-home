@@ -1,13 +1,13 @@
 {
   "reference_date": "2026-10-01",
-  "generated_at": "2026-10-20T06:43:30.316371",
+  "generated_at": "2026-10-21T22:05:27.229154",
   "summary": {
     "total_patients": 300,
-    "overdue_count": 45,
+    "overdue_count": 43,
     "due_soon_count": 5,
-    "flagged_verification_count": 23,
+    "flagged_verification_count": 24,
     "on_track_count": 32,
-    "excluded_count": 195
+    "excluded_count": 196
   },
   "patients": [
     {
@@ -259,20 +259,16 @@
       "clinical_evidence": [
         "Borderline: HbA1c 6.2% (Borderline 5.7-6.4%) [2025-12-23]"
       ],
-      "followup_status": "OVERDUE",
-      "priority": "MEDIUM",
+      "followup_status": "NOT_DUE",
+      "priority": "ROUTINE",
       "worklist": "FLAGGED_VERIFICATION",
       "exclusion_reason": "",
       "warning_flags": [],
       "target_date": "",
-      "days_overdue": 161,
+      "days_overdue": 0,
       "days_until": 0,
-      "reason_tokens": [
-        "4-Month Gap",
-        "161d overdue",
-        "Last DM visit: 2025-12-24"
-      ],
-      "reason_summary": "4-Month Gap | 161d overdue | Last DM visit: 2025-12-24",
+      "reason_tokens": [],
+      "reason_summary": "",
       "latest_visit": {
         "visit_date": "2025-12-24",
         "department": "General Medicine",
@@ -2609,27 +2605,23 @@
       "sex": "F",
       "phone": "9000062374",
       "registered_on": "2020-07-21",
-      "diabetes_category": "CONFIRMED_DIABETIC",
+      "diabetes_category": "BORDERLINE_PREDIABETES",
       "is_lab_only_diagnosis": false,
       "is_duplicate": false,
-      "flag_category": "",
+      "flag_category": "Borderline Prediabetes",
       "clinical_evidence": [
-        "Notes: wt 88 kg; pre-diabetic range sugars; diet counsell..."
+        "Borderline: HbA1c 6.1% (Borderline 5.7-6.4%) [2025-08-12]"
       ],
-      "followup_status": "OVERDUE",
-      "priority": "MEDIUM",
-      "worklist": "OVERDUE",
+      "followup_status": "NOT_DUE",
+      "priority": "ROUTINE",
+      "worklist": "FLAGGED_VERIFICATION",
       "exclusion_reason": "",
       "warning_flags": [],
-      "target_date": "2026-02-09",
-      "days_overdue": 234,
+      "target_date": "",
+      "days_overdue": 0,
       "days_until": 0,
-      "reason_tokens": [
-        "Note: review 6 months",
-        "234d overdue",
-        "Target: 2026-02-09"
-      ],
-      "reason_summary": "Note: review 6 months | 234d overdue | Target: 2026-02-09",
+      "reason_tokens": [],
+      "reason_summary": "",
       "latest_visit": {
         "visit_date": "2025-08-13",
         "department": "General Medicine",
@@ -3042,34 +3034,28 @@
       "sex": "F",
       "phone": "9000055319",
       "registered_on": "2021-02-07",
-      "diabetes_category": "CONFIRMED_DIABETIC",
+      "diabetes_category": "NON_DIABETIC",
       "is_lab_only_diagnosis": false,
       "is_duplicate": false,
       "flag_category": "",
       "clinical_evidence": [
-        "Notes: wt 84 kg, BMI 30; family history of diabetes (both..."
+        "Negation: wt 84 kg, BMI 30; family history of diabetes (both..."
       ],
-      "followup_status": "OVERDUE",
-      "priority": "MEDIUM",
-      "worklist": "OVERDUE",
-      "exclusion_reason": "",
-      "warning_flags": [
-        "Recent Non-Diabetic Visit: Orthopaedics on 2025-08-18 \u2014 Follow-up anchored to Diabetology/DM care"
-      ],
+      "followup_status": "NOT_DUE",
+      "priority": "ROUTINE",
+      "worklist": "EXCLUDED",
+      "exclusion_reason": "Non-diabetic / Normal screening tests / Negated history",
+      "warning_flags": [],
       "target_date": "",
-      "days_overdue": 444,
+      "days_overdue": 0,
       "days_until": 0,
-      "reason_tokens": [
-        "4-Month Gap",
-        "444d overdue",
-        "Last DM visit: 2025-03-16"
-      ],
-      "reason_summary": "4-Month Gap | 444d overdue | Last DM visit: 2025-03-16",
+      "reason_tokens": [],
+      "reason_summary": "",
       "latest_visit": {
-        "visit_date": "2025-03-16",
-        "department": "General Medicine",
-        "doctor": "Dr. Prakash Shenoy",
-        "notes": "wt 84 kg, BMI 30; family history of diabetes (both parents); RBS 104; adv diet, exercise, wt reduction"
+        "visit_date": "2025-08-18",
+        "department": "Orthopaedics",
+        "doctor": "Dr. Farhan Qureshi",
+        "notes": "LBA radiating to R leg x 6 months. SLR 60 deg on R. MRI if no relief in 2 wks."
       },
       "history": {
         "total_visits": 2,
